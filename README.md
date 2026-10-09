@@ -13,8 +13,68 @@ A minor project submitted in partial fulfilment of the requirements for the degr
 
 ## Project Status
 
-**Status: Phase 1 complete**  
-*(Documentation, requirements, architecture, folder structure, and scoring method defined. No application code or dependencies have been installed yet.)*
+**Status: Phase 2**  
+*(Project scaffolding, folder structure, working health check endpoint, and frontend-to-backend connection verified.)*
+
+---
+
+## Local Setup
+
+### Prerequisites
+- **Node.js**: v20+ (tested on Node v24)
+- **npm**: v10+ (tested on npm 11)
+
+### 1. Server Setup (Backend)
+Navigate to the `server/` directory and install dependencies:
+```bash
+cd server
+npm install
+```
+Configure environment variables:
+```bash
+cp .env.example .env
+```
+Run the development server:
+```bash
+npm run dev
+```
+The server starts on port `5000`:
+- **Base URL:** `http://localhost:5000`
+- **Health Check Endpoint:** `http://localhost:5000/api/health`
+
+You can test the health endpoint directly:
+```bash
+curl http://localhost:5000/api/health
+```
+Expected response:
+```json
+{
+  "status": "ok",
+  "service": "skill-gap-platform-api",
+  "time": "2026-10-09T..."
+}
+```
+
+### 2. Client Setup (Frontend)
+In a separate terminal, navigate to the `client/` directory and install dependencies:
+```bash
+cd client
+npm install
+```
+Configure environment variables:
+```bash
+cp .env.example .env
+```
+Start the Vite development server:
+```bash
+npm run dev
+```
+Open your browser at `http://localhost:5173`. You will see the **Skill Gap Platform - Setup Check** page. If the server is running, the card will display:
+```
+Backend: connected
+Status: ok
+Service: skill-gap-platform-api
+```
 
 ---
 
@@ -100,3 +160,4 @@ Comprehensive project documentation is available in the [`docs/`](file:///Users/
 - [`docs/03-folder-structure.md`](file:///Users/bishalsharma/Documents/MINOR%20PROJECT/docs/03-folder-structure.md) — Planned layout for `client/` and `server/`.
 - [`docs/04-scoring-method.md`](file:///Users/bishalsharma/Documents/MINOR%20PROJECT/docs/04-scoring-method.md) — 0-100 scoring scale, gap formulas, worked examples, and limitations.
 - [`docs/05-team-workflow.md`](file:///Users/bishalsharma/Documents/MINOR%20PROJECT/docs/05-team-workflow.md) — 2-person Git branch strategy and phase ownership matrix.
+
