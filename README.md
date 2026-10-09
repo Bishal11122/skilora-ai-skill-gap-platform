@@ -13,19 +13,54 @@ A minor project submitted in partial fulfilment of the requirements for the degr
 
 ## Project Status
 
-**Status: Phase 3 complete**  
-*(Design system, public landing page, accessible navigation, and persistent Light/Dark theme switcher fully implemented and verified.)*
+**Status: Phase 4 complete**
+*(Firebase Authentication, token verification middleware, user profiles in Cloud Firestore, and protected routes fully implemented and verified.)*
 
 ---
 
 ## Available Application Routes
 
-- **`/`** — Public Landing Page (Hero with 5-stage pipeline, 7 feature cards, 9-step workflow, 5 career paths, and final CTA).
-- **`/login`** — Sign In Placeholder (Phase 4 authentication placeholder; no mock forms).
-- **`/register`** — Registration Placeholder (Phase 4 authentication placeholder).
-- **`/forgot-password`** — Password Reset Placeholder (Phase 4 security placeholder).
-- **`/setup-check`** — System Health Check (live API verification endpoint restyled with Phase 3 design tokens).
+- **`/`** — Public Landing Page (Hero, 7 feature cards, 9-step workflow, 5 career paths, and final CTA).
+- **`/login`** — Sign In (Guest route with email & password authentication).
+- **`/register`** — Registration (Guest route with Zod validation, Firebase user creation, and backend profile generation).
+- **`/forgot-password`** — Password Reset (Guest route dispatching password recovery instructions via Firebase Auth).
+- **`/dashboard`** — User Profile Dashboard (Protected route displaying verified profile and display-name update form).
+- **`/setup-check`** — System Health Check (Live API verification endpoint).
 - **`*`** — 404 Catch-All Page Not Found.
+
+---
+
+## Backend API Endpoints
+
+- **`GET /api/health`** — Public API health status.
+- **`GET /api/users/me`** — Protected: Retrieves current authenticated user profile from Cloud Firestore (`users/{uid}`).
+- **`POST /api/users/me`** — Protected: Idempotently creates user profile document `{ uid, displayName, email, createdAt, updatedAt }`.
+- **`PATCH /api/users/me`** — Protected: Updates user `displayName` with Zod validation.
+
+---
+
+## Firebase Configuration
+
+### Frontend Web Configuration (`client/.env`)
+Set the public Firebase Web app configuration values in `client/.env`:
+```env
+VITE_API_URL=http://localhost:5001/api
+VITE_FIREBASE_API_KEY=your-web-api-key
+VITE_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project-id.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+VITE_FIREBASE_APP_ID=your-app-id
+```
+
+### Backend Firebase Admin Configuration (`server/.env`)
+Set the absolute path to your Firebase Admin SDK service account key JSON file in `server/.env`:
+```env
+PORT=5001
+NODE_ENV=development
+CLIENT_URL=http://localhost:5173
+FIREBASE_SERVICE_ACCOUNT_PATH=/absolute/path/to/service-account.json
+```
 
 ---
 

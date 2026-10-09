@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Sun, Moon, Menu, X } from 'lucide-react';
+import { Sun, Moon, Menu, X, LayoutDashboard, LogOut } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useAuth } from '../../hooks/useAuth';
 import Logo from './Logo';
 import Button from './Button';
 import Container from './Container';
 
 export default function Navbar() {
   const { isDark, toggleTheme } = useTheme();
+  const { user, profile, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -54,7 +56,7 @@ export default function Navbar() {
           </nav>
 
           {/* Desktop Actions & Theme Toggle */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3">
             {/* Theme Toggle Button */}
             <button
               type="button"
@@ -70,18 +72,40 @@ export default function Navbar() {
               )}
             </button>
 
-            {/* Login Link */}
-            <Link
-              to="/login"
-              className="text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] px-3 py-2 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
-            >
-              Login
-            </Link>
-
-            {/* Get Started Button */}
-            <Button to="/register" variant="primary" size="md">
-              Get Started
-            </Button>
+            {user ? (
+              /* Signed In State */
+              <div className="flex items-center gap-3">
+                <Link
+                  to="/dashboard"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--text-main)] hover:text-[var(--primary-color)] px-3 py-2 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+                >
+                  <LayoutDashboard className="w-4 h-4 text-[var(--primary-color)]" aria-hidden="true" />
+                  <span>Dashboard</span>
+                </Link>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={logout}
+                  className="text-xs"
+                >
+                  <LogOut className="w-3.5 h-3.5 mr-1" aria-hidden="true" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              /* Signed Out State */
+              <div className="flex items-center gap-3">
+                <Link
+                  to="/login"
+                  className="text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] px-3 py-2 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+                >
+                  Login
+                </Link>
+                <Button to="/register" variant="primary" size="md">
+                  Get Started
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Mobile Actions: Theme Toggle & Hamburger */}
@@ -137,22 +161,49 @@ export default function Navbar() {
             ))}
           </nav>
           <div className="pt-4 border-t border-[var(--border-color)] flex flex-col gap-2">
-            <Link
-              to="/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center py-2.5 px-4 rounded-xl font-medium text-sm text-[var(--text-main)] bg-[var(--surface-elevated)] hover:bg-[var(--border-color)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
-            >
-              Login
-            </Link>
-            <Button
-              to="/register"
-              variant="primary"
-              size="md"
-              className="w-full justify-center"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Get Started
-            </Button>
+            {user ? (
+              <>
+                <Link
+                  to="/dashboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-2.5 px-4 rounded-xl font-medium text-sm text-[var(--text-main)] bg-[var(--surface-elevated)] hover:bg-[var(--border-color)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] flex items-center justify-center gap-2"
+                >
+                  <LayoutDashboard className="w-4 h-4 text-[var(--primary-color)]" />
+                  <span>Dashboard ({profile?.displayName || user?.displayName || 'User'})</span>
+                </Link>
+                <Button
+                  variant="secondary"
+                  size="md"
+                  className="w-full justify-center text-[var(--danger-color)]"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    logout();
+                  }}
+                >
+                  <LogOut className="w-4 h-4 mr-1.5" />
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-2.5 px-4 rounded-xl font-medium text-sm text-[var(--text-main)] bg-[var(--surface-elevated)] hover:bg-[var(--border-color)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+                >
+                  Login
+                </Link>
+                <Button
+                  to="/register"
+                  variant="primary"
+                  size="md"
+                  className="w-full justify-center"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Get Started
+                </Button>
+              </>
+            )}
           </div>
         </div>
       )}

@@ -10,10 +10,14 @@ const app = express();
 // Security HTTP headers
 app.use(helmet());
 
-// CORS configuration restricted strictly to CLIENT_URL
+// CORS configuration: permit CLIENT_URL as well as default Vite dev ports
+const allowedOrigins = Array.from(
+  new Set([CLIENT_URL, 'http://localhost:5173', 'http://localhost:5174'].filter(Boolean))
+);
+
 app.use(
   cors({
-    origin: CLIENT_URL,
+    origin: allowedOrigins,
     credentials: true,
   })
 );

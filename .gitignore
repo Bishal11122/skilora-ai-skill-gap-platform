@@ -24,7 +24,10 @@ Thumbs.db
 *serviceAccountKey*.json
 *firebase-adminsdk*.json
 service-account*.json
+*service-account*.json
 firebase-admin-key.json
+secrets/
+*.secret.json
 
 # Temporary file uploads (resumes are processed in memory / deleted immediately)
 uploads/

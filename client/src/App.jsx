@@ -1,60 +1,70 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { AuthProvider } from './contexts/AuthContext';
 import PublicLayout from './layouts/PublicLayout';
 import LandingPage from './pages/LandingPage';
-import PlaceholderPage from './pages/PlaceholderPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import DashboardPage from './pages/DashboardPage';
 import SetupCheck from './pages/SetupCheck';
 import NotFoundPage from './pages/NotFoundPage';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import GuestRoute from './components/auth/GuestRoute';
 
 export default function App() {
   return (
     <ThemeProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route element={<PublicLayout />}>
-            {/* Landing Page */}
-            <Route path="/" element={<LandingPage />} />
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<PublicLayout />}>
+              {/* Public Routes */}
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/setup-check" element={<SetupCheck />} />
 
-            {/* Phase 4 Auth Placeholders */}
-            <Route
-              path="/login"
-              element={
-                <PlaceholderPage
-                  title="Sign In"
-                  message="Sign-in is not available yet. Authentication is built in Phase 4."
-                  badge="Authentication (Phase 4)"
-                />
-              }
-            />
-            <Route
-              path="/register"
-              element={
-                <PlaceholderPage
-                  title="Create an Account"
-                  message="Account registration is not available yet and authentication is planned for Phase 4."
-                  badge="Registration (Phase 4)"
-                />
-              }
-            />
-            <Route
-              path="/forgot-password"
-              element={
-                <PlaceholderPage
-                  title="Password Recovery"
-                  message="Password recovery is not available yet and belongs to the authentication phase."
-                  badge="Security (Phase 4)"
-                />
-              }
-            />
+              {/* Guest-only Auth Routes */}
+              <Route
+                path="/login"
+                element={
+                  <GuestRoute>
+                    <LoginPage />
+                  </GuestRoute>
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  <GuestRoute>
+                    <RegisterPage />
+                  </GuestRoute>
+                }
+              />
+              <Route
+                path="/forgot-password"
+                element={
+                  <GuestRoute>
+                    <ForgotPasswordPage />
+                  </GuestRoute>
+                }
+              />
 
-            {/* Live Setup & Health Check */}
-            <Route path="/setup-check" element={<SetupCheck />} />
+              {/* Protected Routes */}
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <DashboardPage />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* 404 Catch-All */}
-            <Route path="*" element={<NotFoundPage />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+              {/* 404 Catch-All */}
+              <Route path="*" element={<NotFoundPage />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
