@@ -13,8 +13,19 @@ A minor project submitted in partial fulfilment of the requirements for the degr
 
 ## Project Status
 
-**Status: Phase 2**  
-*(Project scaffolding, folder structure, working health check endpoint, and frontend-to-backend connection verified.)*
+**Status: Phase 3 complete**  
+*(Design system, public landing page, accessible navigation, and persistent Light/Dark theme switcher fully implemented and verified.)*
+
+---
+
+## Available Application Routes
+
+- **`/`** — Public Landing Page (Hero with 5-stage pipeline, 7 feature cards, 9-step workflow, 5 career paths, and final CTA).
+- **`/login`** — Sign In Placeholder (Phase 4 authentication placeholder; no mock forms).
+- **`/register`** — Registration Placeholder (Phase 4 authentication placeholder).
+- **`/forgot-password`** — Password Reset Placeholder (Phase 4 security placeholder).
+- **`/setup-check`** — System Health Check (live API verification endpoint restyled with Phase 3 design tokens).
+- **`*`** — 404 Catch-All Page Not Found.
 
 ---
 
