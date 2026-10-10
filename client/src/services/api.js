@@ -49,7 +49,7 @@ export async function get(endpoint) {
  * Executes an authenticated API request with an Authorization: Bearer <idToken> header.
  * If the server responds with 401, signs out the user cleanly.
  */
-async function authenticatedRequest(endpoint, method = 'GET', body = null) {
+async function authenticatedRequest(endpoint, method = 'GET', body = null, extraOptions = {}) {
   if (!auth?.currentUser) {
     return { data: null, error: 'User is not authenticated' };
   }
@@ -72,11 +72,17 @@ async function authenticatedRequest(endpoint, method = 'GET', body = null) {
   const options = {
     method,
     headers,
+    ...extraOptions,
   };
 
   if (body !== null) {
-    headers['Content-Type'] = 'application/json';
-    options.body = JSON.stringify(body);
+    if (body instanceof FormData) {
+      // Do NOT set Content-Type header manually; browser automatically sets boundary
+      options.body = body;
+    } else {
+      headers['Content-Type'] = 'application/json';
+      options.body = JSON.stringify(body);
+    }
   }
 
   try {
@@ -102,12 +108,15 @@ async function authenticatedRequest(endpoint, method = 'GET', body = null) {
       } catch {
         // Fallback
       }
-      return { data: null, error: errorMessage };
+      return { data: null, error: errorMessage, status: response.status };
     }
 
     const json = await response.json();
-    return { data: json.data || json, error: null };
+    return { data: json.data !== undefined ? json.data : json, error: null, status: response.status };
   } catch (err) {
+    if (err?.name === 'AbortError') {
+      return { data: null, error: 'Request cancelled', aborted: true };
+    }
     const message = err instanceof Error ? err.message : 'Failed to fetch';
     return {
       data: null,
@@ -124,14 +133,29 @@ export function postAuth(endpoint, body) {
   return authenticatedRequest(endpoint, 'POST', body);
 }
 
+export function putAuth(endpoint, body) {
+  return authenticatedRequest(endpoint, 'PUT', body);
+}
+
 export function patchAuth(endpoint, body) {
   return authenticatedRequest(endpoint, 'PATCH', body);
+}
+
+export function deleteAuth(endpoint) {
+  return authenticatedRequest(endpoint, 'DELETE');
+}
+
+export function uploadAuth(endpoint, formData, { method = 'POST', signal } = {}) {
+  return authenticatedRequest(endpoint, method, formData, signal ? { signal } : {});
 }
 
 export default {
   get,
   getAuth,
   postAuth,
+  putAuth,
   patchAuth,
+  deleteAuth,
+  uploadAuth,
   baseUrl: API_BASE_URL,
 };

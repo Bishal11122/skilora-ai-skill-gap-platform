@@ -117,10 +117,15 @@ To protect student data, maintain academic integrity, and keep server operations
 - The authenticated student's unique ID is extracted solely from the verified token decoded by the server (`decodedToken.uid`).
 - This prevents malicious users from impersonating other students or reading/modifying other students' skill roadmaps and quiz scores.
 
-### Rule 4: Resumes Are Not Stored Permanently
-- Uploaded resume files (PDF or text) exist only temporarily in server memory (RAM buffer) or in a temporary processing directory during text extraction.
-- Immediately after text extraction completes, any temporary file buffer is wiped.
-- No student resume PDFs or documents are permanently stored on the server filesystem or in cloud bucket storage. Only the extracted skill list and numerical scores are saved in Cloud Firestore.
+### Rule 4: Resumes Are Not Stored Permanently (Original Specification)
+- Uploaded resume files (PDF or text) were originally designed to exist only temporarily in server memory (RAM buffer) or in a temporary processing directory during text extraction.
+- Immediately after text extraction completes, temporary file buffers are wiped.
+
+### Resume Storage Decision (Owner Approved Amendment)
+- **Private Cloud Storage:** The project owner approved private Cloud Storage for Firebase to retain the student's original resume document for subsequent multi-stage processing.
+- **Explicit Consent Required:** Storage is only permitted when the student explicitly consents (`consent: true`) during upload.
+- **Strict Privacy & Isolation:** Stored objects reside under `resumes/{uid}/{randomId}.{ext}`. They are never public, have no long-lived public URLs, and are accessible solely through the authenticated backend API via the Firebase Admin SDK.
+- **User Control & Deletion:** The file is kept only until the student decides to replace or delete it. A complete delete option (`DELETE /api/resume`) removes both the cloud storage object and associated Firestore metadata.
 
 ### Rule 5: Resume Text is Untrusted Input (Prompt Injection Defense)
 - Text extracted from resumes is treated strictly as **untrusted user input**.
