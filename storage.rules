@@ -1,0 +1,13 @@
+rules_version = '2';
+
+// DENY-ALL Security Rules for Cloud Storage for Firebase.
+// All client-side direct reads and writes are blocked.
+// All resume file uploads and operations occur strictly through the trusted Node.js Express
+// backend utilizing the Firebase Admin SDK (which bypasses client security rules).
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

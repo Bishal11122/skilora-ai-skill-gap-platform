@@ -22,6 +22,8 @@ function formatUserProfile(data) {
     uid: data.uid,
     displayName: data.displayName || '',
     email: data.email || '',
+    selectedCareerId: data.selectedCareerId || null,
+    selectedCareerAt: data.selectedCareerAt ? toIso(data.selectedCareerAt) : null,
     createdAt: toIso(data.createdAt),
     updatedAt: toIso(data.updatedAt),
   };
@@ -74,6 +76,8 @@ export async function createMyProfile(req, res, next) {
       uid: req.user.uid,
       displayName: req.validatedBody.displayName,
       email: req.user.email || '',
+      selectedCareerId: null,
+      selectedCareerAt: null,
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
     };
@@ -125,8 +129,58 @@ export async function updateMyProfile(req, res, next) {
   }
 }
 
+/**
+ * PUT /api/users/me/career
+ * Updates user's selected career after verifying the careerId exists and is active.
+ */
+export async function updateMyCareer(req, res, next) {
+  try {
+    const { careerId } = req.validatedBody;
+
+    // Verify career exists and is active in Firestore
+    const careerRef = db.collection('careers').doc(careerId);
+    const careerSnap = await careerRef.get();
+
+    if (!careerSnap.exists || !careerSnap.data()?.active) {
+      return res.status(404).json({
+        error: {
+          message: 'Selected career does not exist or is inactive',
+        },
+      });
+    }
+
+    const userRef = db.collection('users').doc(req.user.uid);
+    const userSnap = await userRef.get();
+
+    if (!userSnap.exists) {
+      return res.status(404).json({
+        error: {
+          message: 'User profile not found',
+        },
+      });
+    }
+
+    const updates = {
+      selectedCareerId: careerId,
+      selectedCareerAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+    };
+
+    await userRef.update(updates);
+
+    const updatedSnap = await userRef.get();
+
+    return res.status(200).json({
+      data: formatUserProfile(updatedSnap.data()),
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export default {
   getMyProfile,
   createMyProfile,
   updateMyProfile,
+  updateMyCareer,
 };

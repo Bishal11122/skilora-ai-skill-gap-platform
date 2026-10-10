@@ -1,0 +1,13 @@
+rules_version = '2';
+
+// DENY-ALL Security Rules for Cloud Firestore.
+// Direct client-side SDK reads and writes from the browser are blocked.
+// All database queries, profile management, career updates, and resume metadata writes
+// occur exclusively through the authenticated Node.js Express REST API via the Firebase Admin SDK.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
