@@ -46,10 +46,10 @@ export default function DashboardPage() {
 
   const formattedDate = profile?.createdAt
     ? new Date(profile.createdAt).toLocaleDateString(undefined, {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
     : 'Recently';
 
   return (
