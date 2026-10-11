@@ -122,10 +122,10 @@ To protect student data, maintain academic integrity, and keep server operations
 - Immediately after text extraction completes, temporary file buffers are wiped.
 
 ### Resume Storage Decision (Owner Approved Amendment)
-- **Private Cloud Storage:** The project owner approved private Cloud Storage for Firebase to retain the student's original resume document for subsequent multi-stage processing.
+- **Private Cloud Storage:** The project owner approved private Supabase Storage (Free Plan, private bucket `resumes`) to retain the student's original resume document for subsequent multi-stage processing, avoiding the need for the paid Firebase Blaze plan.
 - **Explicit Consent Required:** Storage is only permitted when the student explicitly consents (`consent: true`) during upload.
-- **Strict Privacy & Isolation:** Stored objects reside under `resumes/{uid}/{randomId}.{ext}`. They are never public, have no long-lived public URLs, and are accessible solely through the authenticated backend API via the Firebase Admin SDK.
-- **User Control & Deletion:** The file is kept only until the student decides to replace or delete it. A complete delete option (`DELETE /api/resume`) removes both the cloud storage object and associated Firestore metadata.
+- **Strict Privacy & Isolation:** Stored objects reside under private paths `{uid}/{randomId}.{ext}` in the private `resumes` bucket. They are never public, have no long-lived public URLs, and are accessible solely through the authenticated backend API using the server-side Supabase service-role key.
+- **User Control & Deletion:** The file is kept only until the student decides to replace or delete it. A complete delete option (`DELETE /api/resume`) removes both the Supabase storage object and associated Cloud Firestore metadata.
 
 ### Rule 5: Resume Text is Untrusted Input (Prompt Injection Defense)
 - Text extracted from resumes is treated strictly as **untrusted user input**.

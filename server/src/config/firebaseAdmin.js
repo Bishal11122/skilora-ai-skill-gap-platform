@@ -4,8 +4,7 @@ import { fileURLToPath } from 'url';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
-import { getStorage } from 'firebase-admin/storage';
-import { FIREBASE_SERVICE_ACCOUNT_PATH, FIREBASE_STORAGE_BUCKET } from './env.js';
+import { FIREBASE_SERVICE_ACCOUNT_PATH } from './env.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -45,7 +44,6 @@ try {
     adminApp = getApps().length === 0
       ? initializeApp({
           credential: cert(serviceAccount),
-          storageBucket: FIREBASE_STORAGE_BUCKET || undefined,
         })
       : getApps()[0];
 
@@ -64,33 +62,10 @@ try {
   );
 }
 
-/**
- * Lazily retrieves the configured Cloud Storage bucket instance.
- * Returns null if Admin SDK is not configured, or if FIREBASE_STORAGE_BUCKET is empty.
- */
-export function getStorageBucket() {
-  if (!isAdminConfigured || !adminApp) {
-    return null;
-  }
-
-  const bucketName = FIREBASE_STORAGE_BUCKET && FIREBASE_STORAGE_BUCKET.trim();
-  if (!bucketName) {
-    return null;
-  }
-
-  try {
-    return getStorage(adminApp).bucket(bucketName);
-  } catch (error) {
-    console.warn(`[Firebase Admin] Failed to get storage bucket: ${error.message}`);
-    return null;
-  }
-}
-
 export { adminAuth, db, isAdminConfigured, adminApp };
 export default {
   adminAuth,
   db,
   isAdminConfigured,
   adminApp,
-  getStorageBucket,
 };

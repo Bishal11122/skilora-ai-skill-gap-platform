@@ -205,7 +205,7 @@ export default function ResumeUploadPage() {
     if (error) {
       if (status === 503) {
         setErrorMessage(
-          'Cloud Storage is not yet configured on the server. Please notify the administrator to configure Firebase Storage.'
+          'Private Storage service is not yet configured on the server. Please notify the administrator to configure Supabase Storage.'
         );
       } else {
         setErrorMessage(error);

@@ -1,6 +1,11 @@
 import crypto from 'crypto';
 import { FieldValue } from 'firebase-admin/firestore';
-import { db, getStorageBucket } from '../config/firebaseAdmin.js';
+import { db } from '../config/firebaseAdmin.js';
+import {
+  isStorageConfigured,
+  uploadResumeFile,
+  deleteResumeFile,
+} from '../services/supabaseStorage.service.js';
 import {
   validateResumeBuffer,
   validateConsent,
@@ -33,6 +38,15 @@ function formatResumeResponse(data) {
 }
 
 /**
+ * Normalizes a storage path by stripping any legacy bucket name prefix.
+ * e.g., 'resumes/uid/uuid.pdf' -> 'uid/uuid.pdf'
+ */
+function normalizeStoragePath(rawPath) {
+  if (!rawPath || typeof rawPath !== 'string') return '';
+  return rawPath.startsWith('resumes/') ? rawPath.slice('resumes/'.length) : rawPath;
+}
+
+/**
  * GET /api/resume
  * Retrieves current authenticated user's resume metadata from Firestore `resumes/{uid}`.
  */
@@ -61,10 +75,10 @@ export async function getMyResume(req, res, next) {
 
 /**
  * POST /api/resume
- * Uploads a new resume file to private Cloud Storage and stores metadata in Firestore.
+ * Uploads a new resume file to private Supabase Storage and stores metadata in Firestore.
  */
 export async function createMyResume(req, res, next) {
-  let uploadedFileRef = null;
+  let uploadedPath = null;
 
   try {
     // 1. Consent verification
@@ -110,9 +124,8 @@ export async function createMyResume(req, res, next) {
       });
     }
 
-    // 5. Cloud Storage availability check (Storage Gate)
-    const bucket = getStorageBucket();
-    if (!bucket) {
+    // 5. Storage availability gate (Never pretend success if unconfigured)
+    if (!isStorageConfigured()) {
       return res.status(503).json({
         error: {
           message:
@@ -135,28 +148,24 @@ export async function createMyResume(req, res, next) {
       });
     }
 
-    // 7. Generate safe private storage path
+    // 7. Generate safe private storage path inside user directory
     const randomId = crypto.randomUUID();
-    const storagePath = `resumes/${req.user.uid}/${randomId}.${validation.ext}`;
+    uploadedPath = `${req.user.uid}/${randomId}.${validation.ext}`;
     const sanitizedName = sanitizeFileName(req.file.originalname);
 
-    uploadedFileRef = bucket.file(storagePath);
+    // 8. Upload to Supabase Private Storage
+    await uploadResumeFile(
+      uploadedPath,
+      req.file.buffer,
+      validation.contentType
+    );
 
-    // 8. Upload to Cloud Storage with private metadata
-    await uploadedFileRef.save(req.file.buffer, {
-      contentType: validation.contentType,
-      resumable: false,
-      metadata: {
-        userId: req.user.uid,
-        originalFileName: sanitizedName,
-      },
-    });
-
-    // 9. Write metadata to Firestore
+    // 9. Write metadata to Cloud Firestore
     const metadata = {
       userId: req.user.uid,
       originalFileName: sanitizedName,
-      storagePath,
+      storagePath: uploadedPath,
+      storageProvider: 'supabase',
       contentType: validation.contentType,
       fileSize: req.file.buffer.length,
       targetCareerId: userData.selectedCareerId,
@@ -169,8 +178,8 @@ export async function createMyResume(req, res, next) {
       await resumeRef.set(metadata);
     } catch (dbError) {
       // Clean up orphaned storage object if database write fails
-      if (uploadedFileRef) {
-        await uploadedFileRef.delete().catch(() => {});
+      if (uploadedPath) {
+        await deleteResumeFile(uploadedPath).catch(() => {});
       }
       throw dbError;
     }
@@ -183,8 +192,8 @@ export async function createMyResume(req, res, next) {
       },
     });
   } catch (error) {
-    if (uploadedFileRef) {
-      await uploadedFileRef.delete().catch(() => {});
+    if (uploadedPath) {
+      await deleteResumeFile(uploadedPath).catch(() => {});
     }
     next(error);
   }
@@ -199,7 +208,7 @@ export async function createMyResume(req, res, next) {
  * 4. Clean up old storage object
  */
 export async function replaceMyResume(req, res, next) {
-  let newFileRef = null;
+  let newUploadedPath = null;
 
   try {
     // 1. Consent verification
@@ -220,9 +229,8 @@ export async function replaceMyResume(req, res, next) {
       });
     }
 
-    // 3. Cloud Storage availability check
-    const bucket = getStorageBucket();
-    if (!bucket) {
+    // 3. Storage availability check
+    if (!isStorageConfigured()) {
       return res.status(503).json({
         error: {
           message:
@@ -274,25 +282,21 @@ export async function replaceMyResume(req, res, next) {
 
     // 7. Upload new storage object
     const newRandomId = crypto.randomUUID();
-    const newStoragePath = `resumes/${req.user.uid}/${newRandomId}.${validation.ext}`;
+    newUploadedPath = `${req.user.uid}/${newRandomId}.${validation.ext}`;
     const sanitizedName = sanitizeFileName(req.file.originalname);
 
-    newFileRef = bucket.file(newStoragePath);
-
-    await newFileRef.save(req.file.buffer, {
-      contentType: validation.contentType,
-      resumable: false,
-      metadata: {
-        userId: req.user.uid,
-        originalFileName: sanitizedName,
-      },
-    });
+    await uploadResumeFile(
+      newUploadedPath,
+      req.file.buffer,
+      validation.contentType
+    );
 
     // 8. Update Firestore metadata
     const updatedMetadata = {
       userId: req.user.uid,
       originalFileName: sanitizedName,
-      storagePath: newStoragePath,
+      storagePath: newUploadedPath,
+      storageProvider: 'supabase',
       contentType: validation.contentType,
       fileSize: req.file.buffer.length,
       targetCareerId,
@@ -304,26 +308,17 @@ export async function replaceMyResume(req, res, next) {
       await resumeRef.update(updatedMetadata);
     } catch (dbError) {
       // Revert newly uploaded file on failure to keep old state intact
-      if (newFileRef) {
-        await newFileRef.delete().catch(() => {});
+      if (newUploadedPath) {
+        await deleteResumeFile(newUploadedPath).catch(() => {});
       }
       throw dbError;
     }
 
     // 9. Best-effort deletion of old storage object (only after metadata update succeeded)
-    if (
-      oldData?.storagePath &&
-      typeof oldData.storagePath === 'string' &&
-      oldData.storagePath.startsWith(`resumes/${req.user.uid}/`)
-    ) {
-      try {
-        const oldFileRef = bucket.file(oldData.storagePath);
-        await oldFileRef.delete();
-      } catch {
-        // Safe non-blocking log
-        console.warn(
-          `[ResumeController] Notice: previous storage object cleanup completed with non-fatal status`
-        );
+    if (oldData?.storagePath && typeof oldData.storagePath === 'string') {
+      const oldCleanPath = normalizeStoragePath(oldData.storagePath);
+      if (oldCleanPath.startsWith(`${req.user.uid}/`)) {
+        await deleteResumeFile(oldCleanPath).catch(() => {});
       }
     }
 
@@ -335,8 +330,8 @@ export async function replaceMyResume(req, res, next) {
       },
     });
   } catch (error) {
-    if (newFileRef) {
-      await newFileRef.delete().catch(() => {});
+    if (newUploadedPath) {
+      await deleteResumeFile(newUploadedPath).catch(() => {});
     }
     next(error);
   }
@@ -344,7 +339,7 @@ export async function replaceMyResume(req, res, next) {
 
 /**
  * DELETE /api/resume
- * Deletes current user's resume object from Cloud Storage and document from Firestore.
+ * Deletes current user's resume object from Supabase Storage and document from Firestore.
  */
 export async function deleteMyResume(req, res, next) {
   try {
@@ -362,18 +357,10 @@ export async function deleteMyResume(req, res, next) {
     const data = docSnap.data();
 
     // Verify ownership and expected path prefix
-    if (
-      data.userId === req.user.uid &&
-      data.storagePath &&
-      data.storagePath.startsWith(`resumes/${req.user.uid}/`)
-    ) {
-      const bucket = getStorageBucket();
-      if (bucket) {
-        try {
-          await bucket.file(data.storagePath).delete();
-        } catch {
-          // File may already be absent
-        }
+    if (data.userId === req.user.uid && data.storagePath) {
+      const cleanPath = normalizeStoragePath(data.storagePath);
+      if (cleanPath.startsWith(`${req.user.uid}/`)) {
+        await deleteResumeFile(cleanPath).catch(() => {});
       }
     }
 
