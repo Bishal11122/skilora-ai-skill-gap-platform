@@ -7,6 +7,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import DashboardPage from './pages/DashboardPage';
+import CareerSelectionPage from './pages/CareerSelectionPage';
+import ResumeUploadPage from './pages/ResumeUploadPage';
 import SetupCheck from './pages/SetupCheck';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -55,6 +57,22 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <DashboardPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/career"
+                element={
+                  <ProtectedRoute>
+                    <CareerSelectionPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/resume"
+                element={
+                  <ProtectedRoute>
+                    <ResumeUploadPage />
                   </ProtectedRoute>
                 }
               />

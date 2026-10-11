@@ -1,9 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { User, Mail, Calendar, LogOut, CheckCircle2, Loader2, Sparkles } from 'lucide-react';
+import {
+  User,
+  Mail,
+  Calendar,
+  LogOut,
+  CheckCircle2,
+  Loader2,
+  Sparkles,
+  Compass,
+  FileText,
+  ArrowRight,
+} from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { getAuth } from '../services/api';
 import Container from '../components/ui/Container';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -21,6 +33,50 @@ export default function DashboardPage() {
   const { user, profile, logout, updateDisplayName } = useAuth();
   const [successMessage, setSuccessMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
+
+  const [resumeData, setResumeData] = useState(null);
+  const [careerName, setCareerName] = useState('');
+  const [loadingSetup, setLoadingSetup] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchSetupInfo() {
+      setLoadingSetup(true);
+      try {
+        const [resumeRes, careersRes] = await Promise.all([
+          getAuth('/resume'),
+          getAuth('/careers'),
+        ]);
+        if (!isMounted) return;
+
+        if (resumeRes?.data?.resume) {
+          setResumeData(resumeRes.data.resume);
+        } else {
+          setResumeData(null);
+        }
+
+        if (careersRes?.data && profile?.selectedCareerId) {
+          const match = careersRes.data.find(
+            (c) => c.id === profile.selectedCareerId
+          );
+          if (match) {
+            setCareerName(match.name);
+          } else {
+            setCareerName(profile.selectedCareerId);
+          }
+        }
+      } catch {
+        // Non-blocking fallback
+      } finally {
+        if (isMounted) setLoadingSetup(false);
+      }
+    }
+
+    fetchSetupInfo();
+    return () => {
+      isMounted = false;
+    };
+  }, [profile?.selectedCareerId]);
 
   const {
     register,
@@ -52,6 +108,14 @@ export default function DashboardPage() {
     })
     : 'Recently';
 
+  const formatFileSize = (bytes) => {
+    if (!bytes || bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+  };
+
   return (
     <div className="py-12 sm:py-16 min-h-[75vh]">
       <Container size="narrow">
@@ -81,6 +145,105 @@ export default function DashboardPage() {
             </Button>
           </div>
 
+          {/* Your Setup Card */}
+          <Card className="p-6 sm:p-7 border-[var(--border-color)] bg-[var(--surface-color)] shadow-md space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-[var(--border-color)]">
+              <div className="flex items-center gap-2">
+                <Badge variant="sage">Your Learning Setup</Badge>
+              </div>
+              {loadingSetup ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-[var(--accent-color)]" aria-hidden="true" />
+              ) : (
+                <span className="text-xs text-[var(--text-muted)]">Steps 2 &amp; 3</span>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Step 1: Target Career */}
+              <div className="p-4 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-color)] flex flex-col justify-between space-y-3">
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                    <Compass className="w-4 h-4 text-[var(--primary-color)]" aria-hidden="true" />
+                    <span>Target Career</span>
+                  </div>
+                  {profile?.selectedCareerId ? (
+                    <div>
+                      <p className="text-sm font-bold text-[var(--text-main)]">
+                        {careerName || profile.selectedCareerId}
+                      </p>
+                      <p className="text-[11px] text-[var(--success-color)] font-medium mt-0.5">
+                        Selected &amp; active
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-sm font-semibold text-[var(--text-muted)]">
+                        No career selected yet
+                      </p>
+                      <p className="text-[11px] text-[var(--text-muted)]/80 mt-0.5">
+                        Choose the tech role you are aiming for
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <Button
+                    to="/career"
+                    variant={profile?.selectedCareerId ? 'secondary' : 'primary'}
+                    size="sm"
+                    className="w-full justify-center text-xs"
+                  >
+                    {profile?.selectedCareerId ? 'Change Career' : 'Select Career'}
+                    <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Step 2: Uploaded Resume */}
+              <div className="p-4 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-color)] flex flex-col justify-between space-y-3">
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                    <FileText className="w-4 h-4 text-[var(--accent-color)]" aria-hidden="true" />
+                    <span>Resume Document</span>
+                  </div>
+                  {resumeData ? (
+                    <div>
+                      <p className="text-sm font-bold text-[var(--text-main)] truncate" title={resumeData.originalFileName}>
+                        {resumeData.originalFileName}
+                      </p>
+                      <p className="text-[11px] text-[var(--text-muted)] font-medium mt-0.5">
+                        {formatFileSize(resumeData.fileSize)} • Uploaded{' '}
+                        {new Date(resumeData.uploadedAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-sm font-semibold text-[var(--text-muted)]">
+                        No resume uploaded yet
+                      </p>
+                      <p className="text-[11px] text-[var(--text-muted)]/80 mt-0.5">
+                        Upload your PDF or DOCX resume
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <Button
+                    to="/resume"
+                    variant={resumeData ? 'secondary' : 'primary'}
+                    size="sm"
+                    className="w-full justify-center text-xs"
+                  >
+                    {resumeData ? 'Manage Resume' : 'Upload Resume'}
+                    <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Card>
+
           {/* Honest Roadmap Notice */}
           <div className="p-4 sm:p-5 rounded-2xl bg-[var(--surface-elevated)] border border-[var(--border-color)] space-y-2">
             <div className="flex items-center gap-2 text-xs font-semibold text-[var(--accent-color)] uppercase tracking-wider">
@@ -88,7 +251,7 @@ export default function DashboardPage() {
               <span>Roadmap Milestone Checkpoint</span>
             </div>
             <p className="text-sm text-[var(--text-main)] font-medium">
-              Phase 4: Firebase Authentication & User Profiles is complete.
+              Phase 4: Career Selection &amp; Setup is active.
             </p>
             <p className="text-xs text-[var(--text-muted)] leading-relaxed">
               The full student analytics dashboard—featuring personalized radar charts, interactive roadmap milestones, and gap diagnostics—is scheduled and built in <strong>Phase 12</strong>. This page displays genuine data loaded from your verified Firestore profile.

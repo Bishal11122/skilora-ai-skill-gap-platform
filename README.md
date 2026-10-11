@@ -24,7 +24,9 @@ A minor project submitted in partial fulfilment of the requirements for the degr
 - **`/login`** — Sign In (Guest route with email & password authentication).
 - **`/register`** — Registration (Guest route with Zod validation, Firebase user creation, and backend profile generation).
 - **`/forgot-password`** — Password Reset (Guest route dispatching password recovery instructions via Firebase Auth).
-- **`/dashboard`** — User Profile Dashboard (Protected route displaying verified profile and display-name update form).
+- **`/dashboard`** — User Profile & Setup Dashboard (Protected route displaying profile, active career, and resume status).
+- **`/career`** — Career Selection (Protected route with keyboard-operable radio cards, benchmark skills, and confirmation).
+- **`/resume`** — Resume Upload & Private Storage (Protected route with drag-drop, consent, replace, and delete).
 - **`/setup-check`** — System Health Check (Live API verification endpoint).
 - **`*`** — 404 Catch-All Page Not Found.
 
@@ -36,6 +38,12 @@ A minor project submitted in partial fulfilment of the requirements for the degr
 - **`GET /api/users/me`** — Protected: Retrieves current authenticated user profile from Cloud Firestore (`users/{uid}`).
 - **`POST /api/users/me`** — Protected: Idempotently creates user profile document `{ uid, displayName, email, createdAt, updatedAt }`.
 - **`PATCH /api/users/me`** — Protected: Updates user `displayName` with Zod validation.
+- **`PUT /api/users/me/career`** — Protected: Updates user target career goal (`selectedCareerId`, `selectedCareerAt`) with strict validation.
+- **`GET /api/careers`** — Protected: Retrieves active career benchmark catalog from Firestore.
+- **`GET /api/resume`** — Protected: Retrieves current user's resume metadata from Firestore (`resumes/{uid}`).
+- **`POST /api/resume`** — Protected: Multipart upload to private Cloud Storage (`resumes/{uid}/{randomId}`) with consent and metadata.
+- **`PUT /api/resume`** — Protected: Multipart replacement of stored resume with atomic metadata update and old object cleanup.
+- **`DELETE /api/resume`** — Protected: Permanently deletes stored resume object and metadata for caller.
 
 ---
 
