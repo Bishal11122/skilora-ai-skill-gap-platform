@@ -6,17 +6,20 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon --watch src --watch .env src/index.js",
+    "test": "node --test test/*.test.js"
   },
   "keywords": [],
   "author": "Bishal Sharma, Lakshya Deep",
   "license": "ISC",
   "dependencies": {
+    "@supabase/supabase-js": "^2.117.3",
     "cors": "^2.8.6",
     "dotenv": "^18.0.6",
     "express": "^5.2.1",
     "firebase-admin": "^14.5.0",
     "helmet": "^8.3.0",
+    "multer": "^2.4.0",
     "zod": "^4.6.5"
   },
   "devDependencies": {

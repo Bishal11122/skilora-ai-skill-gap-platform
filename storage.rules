@@ -1,0 +1,13 @@
+rules_version = '2';
+
+// DENY-ALL Security Rules for Cloud Storage for Firebase.
+// NOTE: Firebase Storage is NOT used by this application. Physical resume files are
+// securely stored in private Supabase Storage on the Free tier. This file remains
+// as a strict deny-all defense-in-depth safeguard against accidental Firebase Storage activation.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
