@@ -13,8 +13,8 @@ A minor project submitted in partial fulfilment of the requirements for the degr
 
 ## Project Status
 
-**Status: Phase 4 complete**
-*(Firebase Authentication, token verification middleware, user profiles in Cloud Firestore, and protected routes fully implemented and verified.)*
+**Status: Phase 5 complete**
+*(Firebase Authentication, target career selection, private Supabase Storage resume management, and in-memory PDF/DOCX text extraction pipeline with sanitization, whitespace normalization, and 34 verified backend tests.)*
 
 ---
 
