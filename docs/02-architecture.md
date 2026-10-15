@@ -5,36 +5,39 @@
 **College:** JNCT Professional University, Bhopal  
 **Authors:** Bishal Sharma, Lakshya Deep  
 **Tagline:** Resume → AI → Skills → Learning → Career  
-**Project Status:** Phase 1 complete (Specification & Architecture)
+**Project Status:** Phase 7 complete (Diagnostic Skill Assessment & Scoring Verification)
 
 ---
 
 ## 1. System Overview (In Simple English)
 
-The system is built as a modern, decoupled full-stack web application. It connects five core building blocks:
+The system is built as a modern, decoupled full-stack web application. It connects six core building blocks:
 
 1. **React Frontend (with Vite):**  
-   Runs in the student's web browser. It presents a responsive, modern user interface where students sign in, pick their career, upload resumes, view gap charts, study roadmap steps, and take interactive quizzes.
+   Runs in the student's web browser. It presents a responsive, modern user interface where students sign in, pick their target career, upload resumes, verify skills through timed diagnostic assessments, and view verified competency ratings.
 2. **Node.js + Express Backend:**  
-   Runs on the server. It handles REST API requests from the frontend, verifies who the student is, processes uploaded resumes in memory, computes skill gaps, and talks to the database and AI services.
+   Runs on the server. It handles REST API requests from the frontend, verifies user identity via Firebase ID tokens, processes uploaded resumes in memory, runs the diagnostic assessment engine with server-enforced deadlines, and communicates with Cloud Firestore and AI services.
 3. **Firebase Authentication:**  
    Manages student sign-ups and logins securely. When a student logs in, Firebase gives the frontend a cryptographically signed **ID token**. The frontend attaches this token to every request sent to the Express backend.
 4. **Cloud Firestore (Database):**  
-   A cloud document database where all persistent application data lives: user profiles, target career choices, extracted skill scores, generated roadmaps, and quiz histories. The backend uses the official **Firebase Admin SDK** to read and write records securely.
+   A cloud document database where all persistent application data lives: user profiles, target career choices, extracted skill scores (`extractedSkills`), diagnostic assessment sessions and verified scores (`assessedSkills`, `assessments/{id}`), generated roadmaps, and quiz histories. The backend uses the official **Firebase Admin SDK** to read and write records securely with atomic transactions.
 5. **Groq Cloud API & AI Services:**
    High-performance artificial intelligence powered by Groq Cloud (`llama-3.3-70b-versatile`):
-
-   - Reading resume text and identifying technical skills via structured JSON extraction.
-   - Creating custom, structured learning roadmaps.
-   - Generating practice quiz questions and constructive feedback.  
-   The Groq API is accessed strictly using the official Groq SDK (`groq-sdk`) from the **backend only**.
-
+   - Reads extracted resume text and extracts technical skills via structured JSON schemas.
+   - Accessed strictly via the official Groq SDK (`groq-sdk`) from the **backend only**.
+6. **Diagnostic Skill Assessment Engine:**
+   A deterministic, server-evaluated assessment module that verifies student skills:
+   - Houses 75 deterministic technical questions across all 5 career benchmark profiles (15 questions per career, 3 questions per skill).
+   - Enforces a strict server-side deadline (10 minutes + 15 seconds network grace period).
+   - Sanitizes question payloads delivered to the client, keeping correct options and educational explanations hidden until after server grading.
+   - Prevents duplicate or concurrent submissions using atomic Cloud Firestore transactions.
+   - Stores scores with source `assessment-verified` in `users/{uid}.assessedSkills`, strictly preserving `extractedSkills` (source `resume-inferred`).
 
 ---
 
 ## 2. Data Flow Mermaid Diagram
 
-The diagram below shows how data travels through the system during typical student interactions (such as uploading a resume, generating a roadmap, or taking a quiz):
+The diagram below shows how data travels through the system during typical student interactions (such as uploading a resume, extracting skills via Groq, taking diagnostic assessments, or viewing verified scores):
 
 ```mermaid
 flowchart TD
@@ -46,16 +49,19 @@ flowchart TD
 
     subgraph Server ["Server (Node.js + Express REST API)"]
         AuthMiddleware["Auth Middleware (verifyIdToken)"]
-        ResumeParser["Resume Parser (Memory Buffer / No Storage)"]
-        GapEngine["Skill Gap Calculation Engine"]
+        ResumeParser["Resume Parser (In-Memory Buffer / Supabase Storage)"]
+        GroqService["Groq AI Service (Official groq-sdk)"]
+        AssessmentEngine["Diagnostic Assessment Engine (Server Deadline & Transactions)"]
+        QuestionBank["Question Bank (75 Questions across 5 Careers)"]
         AdminSDK["Firebase Admin SDK"]
-        GeminiService["Gemini AI Service (Official SDK)"]
+        GapEngine["Skill Gap Calculation Engine (Phase 8 Pending)"]
     end
 
     subgraph CloudServices ["Cloud & External Services"]
         FirebaseAuth["Firebase Authentication Service"]
         Firestore["Cloud Firestore Database"]
-        GeminiAPI["Google Gemini API (Model via GEMINI_MODEL)"]
+        GroqAPI["Groq Cloud API (Model via GROQ_MODEL)"]
+        SupabaseStorage["Supabase Private Storage (resumes bucket)"]
     end
 
     %% Client authentication flow
@@ -69,33 +75,27 @@ flowchart TD
     AuthMiddleware -->|6. Verify Token signature & extract UID| AdminSDK
 
     %% Resume Analysis Flow
-    UI -->|7. Upload Resume PDF/Text| ResumeParser
-    ResumeParser -->|8. Send sanitized text as untrusted prompt data| GeminiService
-    GeminiService -->|9. Extract technical skills JSON| GeminiAPI
-    GeminiAPI -->|10. Return extracted skills| GeminiService
-    ResumeParser -.->|11. Delete resume buffer immediately| ResumeParser
+    UI -->|7. Upload Resume PDF/DOCX| ResumeParser
+    ResumeParser -->|8. Store in private bucket with user consent| SupabaseStorage
+    ResumeParser -->|9. Send sanitized text as untrusted prompt data| GroqService
+    GroqService -->|10. Extract technical skills JSON| GroqAPI
+    GroqAPI -->|11. Return extracted skills| GroqService
+    GroqService -->|12. Store resume-inferred skills in users/uid| AdminSDK
 
-    %% Gap Engine & Firestore
-    GeminiService --> GapEngine
-    GapEngine -->|12. Compute Gap = Required - Current| GapEngine
-    GapEngine -->|13. Read/Write User Profile & Scores| AdminSDK
-    AdminSDK -->|14. Store Profile, Skills & Gap Data| Firestore
+    %% Diagnostic Assessment Flow (Phase 7)
+    UI -->|13. Start Assessment POST /api/assessment/start| AssessmentEngine
+    AssessmentEngine -->|14. Fetch questions & strip answer keys| QuestionBank
+    AssessmentEngine -->|15. Create session with 10-min server deadline| AdminSDK
+    AssessmentEngine -->|16. Return sanitized questions + deadline| UI
+    UI -->|17. Submit answers POST /api/assessment/submit| AssessmentEngine
+    AssessmentEngine -->|18. Grade answers & execute atomic transaction| QuestionBank
+    AssessmentEngine -->|19. Store assessment-verified scores in users/uid| AdminSDK
+    AdminSDK -->|20. Persist assessments & user state| Firestore
+    AssessmentEngine -->|21. Return scores & educational review| UI
 
-    %% Roadmap Generation Flow
-    UI -->|15. Request Personalized Roadmap| AuthMiddleware
-    AuthMiddleware --> GeminiService
-    GeminiService -->|16. Prompt with skill gaps & target career| GeminiAPI
-    GeminiAPI -->|17. Structured JSON Roadmap| GeminiService
-    GeminiService -->|18. Save Roadmap| AdminSDK
+    %% Future Gap Engine (Phase 8 Pending)
+    AssessmentEngine -.->|22. Verified scores feed Gap Engine| GapEngine
     AdminSDK --> Firestore
-
-    %% Quiz & Progress Flow
-    UI -->|19. Request Quiz / Submit Answers| AuthMiddleware
-    AuthMiddleware --> GeminiService
-    GeminiService -->|20. Generate Quiz / AI Feedback| GeminiAPI
-    AdminSDK -->|21. Fetch/Update Progress & Quiz History| Firestore
-    Firestore -->|22. Live User State| AdminSDK
-    AdminSDK -->|23. JSON Response| UI
 ```
 
 ---

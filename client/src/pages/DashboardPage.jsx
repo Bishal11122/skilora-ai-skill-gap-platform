@@ -13,6 +13,7 @@ import {
   Compass,
   FileText,
   ArrowRight,
+  Award,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { getAuth } from '../services/api';
@@ -124,7 +125,7 @@ export default function DashboardPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[var(--border-color)]">
             <div className="space-y-1">
               <div className="inline-flex items-center gap-1.5 mb-1">
-                <Badge variant="plum">Phase 6 Active</Badge>
+                <Badge variant="plum">Phase 7 Active</Badge>
               </div>
 
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-main)]">
@@ -155,11 +156,11 @@ export default function DashboardPage() {
               {loadingSetup ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin text-[var(--accent-color)]" aria-hidden="true" />
               ) : (
-                <span className="text-xs text-[var(--text-muted)]">Steps 2 &amp; 3</span>
+                <span className="text-xs text-[var(--text-muted)]">3 Setup Steps</span>
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Step 1: Target Career */}
               <div className="p-4 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-color)] flex flex-col justify-between space-y-3">
                 <div className="space-y-1.5">
@@ -242,8 +243,91 @@ export default function DashboardPage() {
                   </Button>
                 </div>
               </div>
+
+              {/* Step 3: Diagnostic Assessment */}
+              <div className="p-4 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-color)] flex flex-col justify-between space-y-3">
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                    <Award className="w-4 h-4 text-[var(--highlight-color)]" aria-hidden="true" />
+                    <span>Diagnostic Test</span>
+                  </div>
+                  {profile?.assessedSkills && profile.assessedSkills.length > 0 ? (
+                    <div>
+                      <p className="text-sm font-bold text-[var(--text-main)]">
+                        {profile.assessedSkills.length} Skills Verified
+                      </p>
+                      <p className="text-[11px] text-[var(--success-color)] font-medium mt-0.5">
+                        {profile.lastAssessedAt
+                          ? `Assessed ${new Date(profile.lastAssessedAt).toLocaleDateString()}`
+                          : 'Assessment verified'}
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-sm font-semibold text-[var(--text-muted)]">
+                        Not taken yet
+                      </p>
+                      <p className="text-[11px] text-[var(--text-muted)]/80 mt-0.5">
+                        10-minute diagnostic test for {careerName || 'your role'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <Button
+                    to="/assessment"
+                    variant={profile?.assessedSkills && profile.assessedSkills.length > 0 ? 'secondary' : 'primary'}
+                    size="sm"
+                    className="w-full justify-center text-xs"
+                  >
+                    {profile?.assessedSkills && profile.assessedSkills.length > 0 ? 'View / Retake' : 'Take Assessment'}
+                    <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                  </Button>
+                </div>
+              </div>
             </div>
           </Card>
+
+          {/* Verified Assessment Results Card (if completed) */}
+          {profile?.assessedSkills && profile.assessedSkills.length > 0 && (
+            <Card className="p-6 sm:p-7 border-[var(--border-color)] bg-[var(--surface-color)] shadow-md space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-[var(--border-color)]">
+                <div className="flex items-center gap-2">
+                  <Badge variant="plum">Verified Competencies</Badge>
+                  <span className="text-xs text-[var(--text-muted)]">Source: assessment-verified</span>
+                </div>
+                <Button to="/assessment" variant="ghost" size="sm" className="text-xs">
+                  Review Details
+                  <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                {profile.assessedSkills.map((skill) => (
+                  <div
+                    key={skill.name}
+                    className="p-3.5 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-color)] space-y-2"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-[var(--text-main)] truncate">
+                        {skill.name}
+                      </span>
+                      <span className="font-mono text-xs font-bold text-[var(--accent-color)]">
+                        {skill.score}/100
+                      </span>
+                    </div>
+                    <div className="w-full bg-[var(--border-color)] h-1.5 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-[var(--primary-color)] transition-all duration-300"
+                        style={{ width: `${Math.min(100, Math.max(5, skill.score))}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
 
           {/* Honest Roadmap Notice */}
           <div className="p-4 sm:p-5 rounded-2xl bg-[var(--surface-elevated)] border border-[var(--border-color)] space-y-2">
@@ -252,11 +336,11 @@ export default function DashboardPage() {
               <span>Roadmap Milestone Checkpoint</span>
             </div>
             <p className="text-sm text-[var(--text-main)] font-medium">
-              Phase 6: AI Skill Extraction is active.
+              Phase 7: Diagnostic Skill Assessment &amp; Verification is active.
             </p>
 
             <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-              The full student analytics dashboard—featuring personalized radar charts, interactive roadmap milestones, and gap diagnostics—is scheduled and built in <strong>Phase 12</strong>. This page displays genuine data loaded from your verified Firestore profile.
+              Diagnostic testing scores are objectively graded on the backend and stored in your profile as <strong>assessment-verified</strong>. In <strong>Phase 8</strong>, these scores will be mathematically compared with benchmark requirements to compute your real-time skill gaps.
             </p>
           </div>
 

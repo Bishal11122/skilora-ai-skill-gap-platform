@@ -3,6 +3,7 @@ import healthRoutes from './health.routes.js';
 import userRoutes from './user.routes.js';
 import careerRoutes from './career.routes.js';
 import resumeRoutes from './resume.routes.js';
+import assessmentRoutes from './assessment.routes.js';
 
 const apiRouter = Router();
 
@@ -11,5 +12,6 @@ apiRouter.use('/health', healthRoutes);
 apiRouter.use('/users', userRoutes);
 apiRouter.use('/careers', careerRoutes);
 apiRouter.use('/resume', resumeRoutes);
+apiRouter.use('/assessment', assessmentRoutes);
 
 export default apiRouter;

@@ -16,6 +16,7 @@ import {
   HardDrive,
   Sparkles,
   Brain,
+  ArrowRight,
 } from 'lucide-react';
 
 import { useAuth } from '../hooks/useAuth';
@@ -544,11 +545,17 @@ export default function ResumeUploadPage() {
               </div>
 
               {/* Honest Roadmap Note */}
-              <div className="p-3.5 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-color)] flex items-start gap-2.5 text-xs text-[var(--text-muted)]">
-                <Info className="w-4 h-4 text-[var(--accent-color)] shrink-0 mt-0.5" aria-hidden="true" />
-                <p className="leading-relaxed">
-                  <strong>What happens next:</strong> AI skill extraction (<strong>Phase 6</strong>) analyzes your resume to infer baseline scores. Diagnostic testing (<strong>Phase 7</strong>) and skill gap calculation (<strong>Phase 8</strong>) will verify your knowledge and measure missing industry skills.
-                </p>
+              <div className="p-3.5 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-color)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-[var(--text-muted)]">
+                <div className="flex items-start gap-2.5">
+                  <Info className="w-4 h-4 text-[var(--accent-color)] shrink-0 mt-0.5" aria-hidden="true" />
+                  <p className="leading-relaxed">
+                    <strong>What happens next:</strong> AI skill extraction (<strong>Phase 6</strong>) infers baseline scores. Verify your real technical competency with the 10-minute <strong>Phase 7 Diagnostic Assessment</strong>.
+                  </p>
+                </div>
+                <Button to="/assessment" variant="primary" size="sm" className="shrink-0 text-xs self-start sm:self-center">
+                  Take Assessment
+                  <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                </Button>
               </div>
 
 
