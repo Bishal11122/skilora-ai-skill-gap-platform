@@ -26,6 +26,9 @@ function formatUserProfile(data) {
     selectedCareerAt: data.selectedCareerAt ? toIso(data.selectedCareerAt) : null,
     extractedSkills: Array.isArray(data.extractedSkills) ? data.extractedSkills : [],
     skillsExtractedAt: data.skillsExtractedAt ? toIso(data.skillsExtractedAt) : null,
+    assessedSkills: Array.isArray(data.assessedSkills) ? data.assessedSkills : [],
+    lastAssessmentId: data.lastAssessmentId || null,
+    lastAssessedAt: data.lastAssessedAt ? toIso(data.lastAssessedAt) : null,
     createdAt: toIso(data.createdAt),
     updatedAt: toIso(data.updatedAt),
   };

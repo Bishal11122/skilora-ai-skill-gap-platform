@@ -5,7 +5,7 @@
 **College:** JNCT Professional University, Bhopal  
 **Authors:** Bishal Sharma, Lakshya Deep  
 **Tagline:** Resume → AI → Skills → Learning → Career  
-**Project Status:** Phase 1 complete (Specification & Architecture)
+**Project Status:** Phase 7 complete (Diagnostic Skill Assessment & Scoring Verification)
 
 ---
 
@@ -72,10 +72,9 @@ The table below outlines all 14 project phases. The **Owner** column is left bla
 | **Phase 4** | Career Selection Module & Industry Benchmark Dataset | *(Unassigned)* | **Complete** |
 | **Phase 5** | Resume Upload & In-Memory Text Extraction Pipeline | *(Unassigned)* | **Complete** |
 | **Phase 6** | AI Skill Extraction via Groq Cloud API | | **Complete** |
-
-| **Phase 7** | Diagnostic Skill Assessment Module & Scoring Verification | | Pending |
+| **Phase 7** | Diagnostic Skill Assessment Module & Scoring Verification | | **Complete** |
 | **Phase 8** | Skill Gap Calculation Engine & Priority Ranking | | Pending |
-| **Phase 9** | AI Personalized Roadmap Generation via Gemini API | | Pending |
+| **Phase 9** | AI Personalized Roadmap Generation | | Pending |
 | **Phase 10** | Curated Learning Resources Recommendation Engine | | Pending |
 | **Phase 11** | AI Practice Quizzes & Automated Feedback Generation | | Pending |
 | **Phase 12** | Student Dashboard UI & Visual Analytics (Recharts) | | Pending |

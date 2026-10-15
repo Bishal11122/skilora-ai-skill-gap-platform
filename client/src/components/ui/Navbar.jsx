@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Sun, Moon, Menu, X, LayoutDashboard, LogOut, Compass } from 'lucide-react';
+import { Sun, Moon, Menu, X, LayoutDashboard, LogOut, Compass, Award } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
 import Logo from './Logo';
@@ -81,6 +81,13 @@ export default function Navbar() {
                 >
                   <Compass className="w-4 h-4 text-[var(--accent-color)]" aria-hidden="true" />
                   <span>Careers</span>
+                </Link>
+                <Link
+                  to="/assessment"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] px-2.5 py-2 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+                >
+                  <Award className="w-4 h-4 text-[var(--highlight-color)]" aria-hidden="true" />
+                  <span>Assessment</span>
                 </Link>
                 <Link
                   to="/dashboard"
@@ -177,6 +184,14 @@ export default function Navbar() {
                 >
                   <Compass className="w-4 h-4 text-[var(--accent-color)]" />
                   <span>Target Career</span>
+                </Link>
+                <Link
+                  to="/assessment"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-2.5 px-4 rounded-xl font-medium text-sm text-[var(--text-main)] bg-[var(--surface-elevated)] hover:bg-[var(--border-color)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] flex items-center justify-center gap-2"
+                >
+                  <Award className="w-4 h-4 text-[var(--highlight-color)]" />
+                  <span>Diagnostic Assessment</span>
                 </Link>
                 <Link
                   to="/dashboard"

@@ -13,8 +13,8 @@ A minor project submitted in partial fulfilment of the requirements for the degr
 
 ## Project Status
 
-**Status: Phase 6 complete**
-*(Firebase Authentication, target career selection, private Supabase Storage resume management, in-memory PDF/DOCX text extraction pipeline, and AI Skill Extraction via Groq Cloud API with 44 verified backend tests.)*
+**Status: Phase 7 complete**
+*(Firebase Authentication, target career selection, private Supabase Storage resume management, in-memory PDF/DOCX text extraction pipeline, AI Skill Extraction via Groq Cloud API, and Diagnostic Skill Assessment & Scoring Verification with 56 verified backend tests.)*
 
 ---
 
@@ -24,9 +24,10 @@ A minor project submitted in partial fulfilment of the requirements for the degr
 - **`/login`** — Sign In (Guest route with email & password authentication).
 - **`/register`** — Registration (Guest route with Zod validation, Firebase user creation, and backend profile generation).
 - **`/forgot-password`** — Password Reset (Guest route dispatching password recovery instructions via Firebase Auth).
-- **`/dashboard`** — User Profile & Setup Dashboard (Protected route displaying profile, active career, and resume status).
+- **`/dashboard`** — User Profile & Setup Dashboard (Protected route displaying profile, active career, resume status, and verified competencies).
 - **`/career`** — Career Selection (Protected route with keyboard-operable radio cards, benchmark skills, and confirmation).
 - **`/resume`** — Resume Upload, Storage & AI Skill Extraction (Protected route with drag-drop, consent, replace, delete, and Groq AI analysis).
+- **`/assessment`** — Diagnostic Skill Assessment (Protected route with 10-minute server timer, 15-question evaluator across career benchmark skills, and verified score review).
 - **`/setup-check`** — System Health Check (Live API verification endpoint).
 - **`*`** — 404 Catch-All Page Not Found.
 
@@ -45,6 +46,10 @@ A minor project submitted in partial fulfilment of the requirements for the degr
 - **`PUT /api/resume`** — Protected: Multipart replacement of stored resume with atomic metadata update and old object cleanup.
 - **`DELETE /api/resume`** — Protected: Permanently deletes stored resume object and metadata for caller.
 - **`POST /api/resume/analyze`** — Protected: Extracts and infers technical skills from uploaded resume using Groq Cloud API (`groq-sdk`).
+- **`GET /api/assessment/status`** — Protected: Retrieves current active assessment session or previous verified assessment results.
+- **`POST /api/assessment/start`** — Protected: Initializes or resumes 10-minute diagnostic session with sanitized question payload.
+- **`POST /api/assessment/submit`** — Protected: Submits answers with atomic Firestore transaction, server-side grading, deadline enforcement, and explanation reveal.
+- **`GET /api/assessment/result/:assessmentId`** — Protected: Retrieves stored verified assessment result and explanations for caller.
 
 
 ---
