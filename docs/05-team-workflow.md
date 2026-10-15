@@ -71,7 +71,8 @@ The table below outlines all 14 project phases. The **Owner** column is left bla
 | **Phase 3** | Firebase Authentication, Session State & Token Verification | *(Unassigned)* | **Complete** |
 | **Phase 4** | Career Selection Module & Industry Benchmark Dataset | *(Unassigned)* | **Complete** |
 | **Phase 5** | Resume Upload & In-Memory Text Extraction Pipeline | *(Unassigned)* | **Complete** |
-| **Phase 6** | AI Skill Extraction via Google Gemini API | | Pending |
+| **Phase 6** | AI Skill Extraction via Groq Cloud API | | **Complete** |
+
 | **Phase 7** | Diagnostic Skill Assessment Module & Scoring Verification | | Pending |
 | **Phase 8** | Skill Gap Calculation Engine & Priority Ranking | | Pending |
 | **Phase 9** | AI Personalized Roadmap Generation via Gemini API | | Pending |

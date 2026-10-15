@@ -17,7 +17,8 @@
 skill-gap-platform/
 ├── docs/                   # Architectural blueprints, requirements, scoring, and workflow documentation
 ├── client/                 # React frontend application built with Vite and Tailwind CSS
-├── server/                 # Node.js and Express REST API backend with Firebase Admin and Gemini SDK
+├── server/                 # Node.js and Express REST API backend with Firebase Admin and Groq SDK
+
 ├── .gitignore              # Files, secrets, and directories excluded from Git tracking
 └── README.md               # Project summary, author credentials, setup guidelines, and phase status
 ```
@@ -85,13 +86,13 @@ server/
 │   ├── controllers/        # Request handlers implementing business logic for each route
 │   ├── middleware/         # Express middlewares for Firebase ID token verification and error handling
 │   ├── routes/             # Express router definitions mapping API endpoints to controllers
-│   ├── services/           # Integration services for the Google Gemini API, Firestore, and file parsers
+│   ├── services/           # Integration services for the Groq Cloud API, Firestore, and file parsers
 │   ├── data/               # Static benchmark datasets (predefined career skills and benchmark levels)
 │   ├── utils/              # Helper utilities for calculations, prompt formatting, and response sanitization
 │   └── app.js              # Express application setup, middleware configuration, and router mounting
 ├── uploads/                # Temporary local directory for in-flight resume processing (never tracked in Git)
-├── .env.example            # Template for backend secrets (PORT, GEMINI_API_KEY, GEMINI_MODEL, etc.)
-├── package.json            # Server dependencies (Express, @google/genai, firebase-admin, multer, cors, dotenv)
+├── .env.example            # Template for backend secrets (PORT, GROQ_API_KEY, GROQ_MODEL, etc.)
+├── package.json            # Server dependencies (Express, groq-sdk, firebase-admin, multer, cors, dotenv)
 └── server.js               # Server entry point that initializes ports and begins listening for requests
 ```
 
@@ -100,7 +101,8 @@ server/
 - **`src/controllers/`** — Processes incoming HTTP requests, validates input, calls services, and sends responses.
 - **`src/middleware/`** — Inspects Firebase bearer tokens to verify user identity before reaching controllers.
 - **`src/routes/`** — Groups REST API endpoints by module (auth, careers, resume, assessment, roadmap, quizzes).
-- **`src/services/`** — Contains specialized service modules for Gemini AI prompting, Firestore queries, and resume parsing.
+- **`src/services/`** — Contains specialized service modules for Groq AI prompting, Firestore queries, and resume parsing.
+
 - **`src/data/`** — Stores career profiles, benchmark levels, and standard skill taxonomies.
 - **`src/utils/`** — Houses mathematical scoring formulas, gap classification functions, and input sanitizers.
 - **`uploads/`** — Acts as a short-lived scratch folder for handling file streams during resume text extraction.

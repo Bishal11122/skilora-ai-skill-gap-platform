@@ -45,6 +45,22 @@ export const SUPABASE_STORAGE_BUCKET = (process.env.SUPABASE_STORAGE_BUCKET || '
   .trim()
   .replace(/^["']|["']$/g, '') || 'resumes';
 
+// Groq Cloud API Configuration (Strictly backend-only)
+export function getGroqApiKey() {
+  return (process.env.GROQ_API_KEY || '')
+    .trim()
+    .replace(/^["']|["']$/g, '');
+}
+
+export const GROQ_MODEL = (process.env.GROQ_MODEL || 'llama-3.3-70b-versatile')
+  .trim()
+  .replace(/^["']|["']$/g, '') || 'llama-3.3-70b-versatile';
+
+export function isGroqConfigured() {
+  const key = getGroqApiKey();
+  return Boolean(key);
+}
+
 export default {
   PORT,
   NODE_ENV,
@@ -54,4 +70,10 @@ export default {
   SUPABASE_URL,
   SUPABASE_SERVICE_ROLE_KEY,
   SUPABASE_STORAGE_BUCKET,
+  get GROQ_API_KEY() {
+    return getGroqApiKey();
+  },
+  GROQ_MODEL,
+  isGroqConfigured,
+  getGroqApiKey,
 };

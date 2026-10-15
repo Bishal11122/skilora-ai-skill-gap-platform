@@ -213,6 +213,48 @@ export async function deleteResumeFile(storagePath) {
   }
 }
 
+/**
+ * Downloads a file from the private Supabase Storage bucket as an in-memory Buffer.
+ *
+ * @param {string} storagePath - Relative path inside the bucket, e.g. `${uid}/${randomId}.${ext}`
+ * @returns {Promise<Buffer>}
+ */
+export async function downloadResumeFile(storagePath) {
+  const client = getSupabaseClient();
+  if (!client) {
+    const error = new Error('Storage service is not configured');
+    error.status = 503;
+    throw error;
+  }
+
+  if (!storagePath || typeof storagePath !== 'string') {
+    const error = new Error('Invalid storage path');
+    error.status = 400;
+    throw error;
+  }
+
+  const cleanPath = storagePath.startsWith('resumes/')
+    ? storagePath.slice('resumes/'.length)
+    : storagePath;
+
+  const bucket = getStorageBucketName();
+  const { data, error } = await client.storage
+    .from(bucket)
+    .download(cleanPath);
+
+  if (error || !data) {
+    const downloadError = new Error(
+      error?.message || 'Failed to download resume file from storage'
+    );
+    downloadError.status = error?.status === 404 || error?.statusCode === '404' ? 404 : 500;
+    downloadError.original = error;
+    throw downloadError;
+  }
+
+  const arrayBuffer = await data.arrayBuffer();
+  return Buffer.from(arrayBuffer);
+}
+
 export default {
   getSanitizedSupabaseUrl,
   isStorageConfigured,
@@ -221,4 +263,5 @@ export default {
   setSupabaseClientForTesting,
   uploadResumeFile,
   deleteResumeFile,
+  downloadResumeFile,
 };

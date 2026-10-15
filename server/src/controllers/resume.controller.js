@@ -1,16 +1,27 @@
 import crypto from 'crypto';
 import { FieldValue } from 'firebase-admin/firestore';
 import { db } from '../config/firebaseAdmin.js';
+import { isGroqConfigured } from '../config/env.js';
 import {
   isStorageConfigured,
   uploadResumeFile,
   deleteResumeFile,
+  downloadResumeFile,
 } from '../services/supabaseStorage.service.js';
 import {
   validateResumeBuffer,
   validateConsent,
   sanitizeFileName,
 } from '../validators/resumeFile.validator.js';
+import {
+  extractResumeText,
+  ResumeParseError,
+} from '../services/resumeParser.service.js';
+import {
+  extractSkillsWithGroq,
+  GroqServiceError,
+} from '../services/groq.service.js';
+
 
 /**
  * Format resume metadata for client response.
@@ -377,9 +388,187 @@ export async function deleteMyResume(req, res, next) {
   }
 }
 
+/**
+ * POST /api/resume/analyze
+ * Extracts and infers technical skills from the user's stored resume using Groq Cloud API.
+ *
+ * Strict Privacy & Integrity Rules:
+ * 1. Analyzes only the current authenticated user's resume (req.user.uid).
+ * 2. File is downloaded in-memory, parsed into transient text, and raw text is never stored in DB.
+ * 3. Prompt injection defense with isolated data boundaries.
+ * 4. Extracted skills validated via Zod, clamped to 0-100 integer range, and tagged with source: 'resume-inferred'.
+ * 5. Persists structured skills in Firestore users/{uid}.extractedSkills.
+ */
+export async function analyzeMyResume(req, res, next) {
+  try {
+    // 1. Check AI service configuration
+    if (!isGroqConfigured()) {
+      return res.status(503).json({
+        error: {
+          message:
+            'AI skill extraction service is not configured. Please contact the administrator.',
+          code: 'GROQ_NOT_CONFIGURED',
+        },
+      });
+    }
+
+    // 2. Storage availability gate
+    if (!isStorageConfigured()) {
+      return res.status(503).json({
+        error: {
+          message:
+            'Storage service is not configured. Please contact the administrator.',
+          code: 'STORAGE_NOT_CONFIGURED',
+        },
+      });
+    }
+
+    // 3. Verify user's resume exists
+    const resumeRef = db.collection('resumes').doc(req.user.uid);
+    const resumeSnap = await resumeRef.get();
+
+    if (!resumeSnap.exists) {
+      return res.status(404).json({
+        error: {
+          message: 'No resume found to analyze. Please upload a resume first.',
+          code: 'RESUME_NOT_FOUND',
+        },
+      });
+    }
+
+    const resumeData = resumeSnap.data();
+
+    // Verify ownership
+    if (resumeData.userId !== req.user.uid) {
+      return res.status(403).json({
+        error: {
+          message: 'Unauthorized access to resume document',
+          code: 'FORBIDDEN',
+        },
+      });
+    }
+
+    // 4. Verify target career
+    const userRef = db.collection('users').doc(req.user.uid);
+    const userSnap = await userRef.get();
+    const userData = userSnap.data();
+    const targetCareerId =
+      userData?.selectedCareerId || resumeData.targetCareerId;
+
+    if (!targetCareerId) {
+      return res.status(409).json({
+        error: {
+          message:
+            'A target career must be selected before analyzing your resume.',
+          code: 'CAREER_NOT_SELECTED',
+        },
+      });
+    }
+
+    // Fetch target career metadata for benchmark context
+    let targetCareerName = targetCareerId;
+    let benchmarkSkills = [];
+
+    try {
+      const careerRef = db.collection('careers').doc(targetCareerId);
+      const careerSnap = await careerRef.get();
+      if (careerSnap.exists) {
+        const cData = careerSnap.data();
+        targetCareerName = cData.name || targetCareerId;
+        benchmarkSkills = Array.isArray(cData.skills) ? cData.skills : [];
+      }
+    } catch {
+      // Non-blocking fallback: proceed with career ID
+    }
+
+    // 5. Download resume file buffer in-memory
+    const cleanStoragePath = normalizeStoragePath(resumeData.storagePath);
+    let fileBuffer;
+    try {
+      fileBuffer = await downloadResumeFile(cleanStoragePath);
+    } catch (downloadErr) {
+      return res.status(downloadErr.status || 500).json({
+        error: {
+          message:
+            'Failed to retrieve stored resume file from private storage.',
+          code: 'STORAGE_DOWNLOAD_FAILED',
+        },
+      });
+    }
+
+    // 6. In-memory text extraction & sanitization (Phase 5 service)
+    let parsedTextResult;
+    try {
+      parsedTextResult = await extractResumeText(
+        fileBuffer,
+        resumeData.originalFileName || 'resume.pdf'
+      );
+    } catch (parseErr) {
+      if (parseErr instanceof ResumeParseError) {
+        return res.status(parseErr.statusCode || 422).json({
+          error: {
+            message: parseErr.message,
+            code: parseErr.code,
+          },
+        });
+      }
+      throw parseErr;
+    }
+
+    // 7. Extract skills using Groq Cloud API
+    let extraction;
+    try {
+      extraction = await extractSkillsWithGroq(parsedTextResult.text, {
+        targetCareerName,
+        benchmarkSkills,
+      });
+    } catch (groqErr) {
+      if (groqErr instanceof GroqServiceError) {
+        return res.status(groqErr.statusCode || 502).json({
+          error: {
+            message: groqErr.message,
+            code: groqErr.code,
+          },
+        });
+      }
+      throw groqErr;
+    }
+
+    // 8. Persist structured skill data in Firestore
+    // Update users/{uid} with extractedSkills
+    await userRef.update({
+      extractedSkills: extraction.skills,
+      skillsExtractedAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+
+    // Update resumes/{uid} with analysis status (metadata only, zero raw text)
+    await resumeRef.update({
+      analysisStatus: 'completed',
+      analyzedAt: FieldValue.serverTimestamp(),
+      skillCount: extraction.skills.length,
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+
+    // 9. Return structured response (never return raw extracted text)
+    return res.status(200).json({
+      data: {
+        skills: extraction.skills,
+        skillCount: extraction.skills.length,
+        targetCareerId,
+        targetCareerName,
+        analyzedAt: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export default {
   getMyResume,
   createMyResume,
   replaceMyResume,
   deleteMyResume,
+  analyzeMyResume,
 };
