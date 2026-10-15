@@ -124,8 +124,9 @@ export default function DashboardPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[var(--border-color)]">
             <div className="space-y-1">
               <div className="inline-flex items-center gap-1.5 mb-1">
-                <Badge variant="plum">Phase 4 Active</Badge>
+                <Badge variant="plum">Phase 6 Active</Badge>
               </div>
+
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-main)]">
                 Welcome, {profile?.displayName || user?.displayName || 'Learner'}
               </h1>
@@ -251,8 +252,9 @@ export default function DashboardPage() {
               <span>Roadmap Milestone Checkpoint</span>
             </div>
             <p className="text-sm text-[var(--text-main)] font-medium">
-              Phase 4: Career Selection &amp; Setup is active.
+              Phase 6: AI Skill Extraction is active.
             </p>
+
             <p className="text-xs text-[var(--text-muted)] leading-relaxed">
               The full student analytics dashboard—featuring personalized radar charts, interactive roadmap milestones, and gap diagnostics—is scheduled and built in <strong>Phase 12</strong>. This page displays genuine data loaded from your verified Firestore profile.
             </p>

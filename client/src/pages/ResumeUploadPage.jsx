@@ -14,9 +14,12 @@ import {
   Info,
   Clock,
   HardDrive,
+  Sparkles,
+  Brain,
 } from 'lucide-react';
+
 import { useAuth } from '../hooks/useAuth';
-import { getAuth, uploadAuth, deleteAuth } from '../services/api';
+import { getAuth, postAuth, uploadAuth, deleteAuth } from '../services/api';
 import Container from '../components/ui/Container';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -32,6 +35,13 @@ function formatBytes(bytes) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 }
 
+function getSkillLevelLabel(level) {
+  if (level >= 75) return { label: 'Proficient', color: 'emerald' };
+  if (level >= 50) return { label: 'Competent', color: 'indigo' };
+  if (level >= 25) return { label: 'Developing', color: 'amber' };
+  return { label: 'Beginner', color: 'slate' };
+}
+
 export default function ResumeUploadPage() {
   const { profile } = useAuth();
   const navigate = useNavigate();
@@ -39,6 +49,11 @@ export default function ResumeUploadPage() {
   const [loading, setLoading] = useState(true);
   const [existingResume, setExistingResume] = useState(null);
   const [targetCareerName, setTargetCareerName] = useState('');
+
+  // Phase 6: Extracted skills state
+  const [extractedSkills, setExtractedSkills] = useState([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analyzedAt, setAnalyzedAt] = useState(null);
 
   // Selected file state
   const [selectedFile, setSelectedFile] = useState(null);
@@ -54,6 +69,7 @@ export default function ResumeUploadPage() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [confirmReplace, setConfirmReplace] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
 
   // In-flight abort controller
   const abortControllerRef = useRef(null);
@@ -99,10 +115,19 @@ export default function ResumeUploadPage() {
         setExistingResume(null);
       }
 
+      if (userRes.data?.extractedSkills && Array.isArray(userRes.data.extractedSkills)) {
+        setExtractedSkills(userRes.data.extractedSkills);
+        setAnalyzedAt(userRes.data.skillsExtractedAt || null);
+      } else {
+        setExtractedSkills([]);
+        setAnalyzedAt(null);
+      }
+
       setLoading(false);
     }
 
     loadResumeAndCareer();
+
 
     return () => {
       isMounted = false;
@@ -243,11 +268,43 @@ export default function ResumeUploadPage() {
     }
 
     setExistingResume(null);
+    setExtractedSkills([]);
+    setAnalyzedAt(null);
     setSelectedFile(null);
     setConsentChecked(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
     setSuccessMessage('Resume and stored metadata have been deleted completely.');
   };
+
+  const handleAnalyzeResume = async () => {
+    setIsAnalyzing(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    const { data, error, status } = await postAuth('/resume/analyze');
+
+    setIsAnalyzing(false);
+
+    if (error) {
+      if (status === 503) {
+        setErrorMessage(
+          'Groq AI service is not yet configured on the server. Please set GROQ_API_KEY in server/.env.'
+        );
+      } else {
+        setErrorMessage(error);
+      }
+      return;
+    }
+
+    if (data?.skills) {
+      setExtractedSkills(data.skills);
+      setAnalyzedAt(data.analyzedAt);
+      setSuccessMessage(
+        `AI Skill Extraction complete! Detected ${data.skills.length} technical skills from your resume.`
+      );
+    }
+  };
+
 
   if (loading) {
     return (
@@ -379,15 +436,121 @@ export default function ResumeUploadPage() {
                 </div>
               </div>
 
+              {/* Phase 6: AI Skill Extraction Section */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-[var(--surface-elevated)] border border-[var(--border-color)] space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-[var(--border-color)]">
+                  <div className="space-y-0.5">
+                    <div className="inline-flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4 text-amber-500" aria-hidden="true" />
+                      <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent-color)]">
+                        Phase 6 AI Skill Extraction
+                      </span>
+                    </div>
+                    <h3 className="text-sm sm:text-base font-bold text-[var(--text-main)]">
+                      Technical Skills Extracted from Resume
+                    </h3>
+                  </div>
+
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={handleAnalyzeResume}
+                    disabled={isAnalyzing || isDeleting || isUploading}
+                    className="self-start sm:self-auto text-xs"
+                  >
+                    {isAnalyzing ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                        Analyzing with Groq AI...
+                      </>
+                    ) : (
+                      <>
+                        <Brain className="w-3.5 h-3.5 mr-1.5 text-amber-300" />
+                        {extractedSkills.length > 0 ? 'Re-Analyze Skills' : 'Extract Skills with AI'}
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                {extractedSkills.length > 0 ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
+                      <span>Detected <strong>{extractedSkills.length}</strong> skills</span>
+                      {analyzedAt && (
+                        <span>Last analyzed: {new Date(analyzedAt).toLocaleDateString()}</span>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-80 overflow-y-auto pr-1">
+                      {extractedSkills.map((skill, idx) => {
+                        const levelInfo = getSkillLevelLabel(skill.level);
+                        return (
+                          <div
+                            key={`${skill.name}-${idx}`}
+                            className="p-3 rounded-xl bg-[var(--surface-color)] border border-[var(--border-color)] flex flex-col justify-between gap-2 text-xs shadow-sm"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <span className="font-bold text-[var(--text-main)] text-sm block">
+                                  {skill.name}
+                                </span>
+                                {skill.category && (
+                                  <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-semibold">
+                                    {skill.category}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex flex-col items-end gap-1">
+                                <span className="font-mono font-bold text-xs text-[var(--text-main)]">
+                                  {skill.level}/100
+                                </span>
+                                <Badge variant="plum" className="text-[10px] py-0 px-1.5">
+                                  resume-inferred
+                                </Badge>
+                              </div>
+                            </div>
+
+                            {/* Competency Level Bar */}
+                            <div className="space-y-1">
+                              <div className="w-full bg-[var(--border-color)] h-1.5 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full rounded-full transition-all duration-300 bg-[var(--accent-color)]"
+                                  style={{ width: `${Math.min(100, Math.max(5, skill.level))}%` }}
+                                />
+                              </div>
+                              <span className="text-[10px] text-[var(--text-muted)] capitalize block">
+                                {levelInfo.label} Level
+                              </span>
+                            </div>
+
+                            {skill.reasoning && (
+                              <p className="text-[11px] text-[var(--text-muted)] italic leading-tight pt-1 border-t border-[var(--border-color)]/60">
+                                {skill.reasoning}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-4 rounded-xl bg-[var(--surface-color)] border border-dashed border-[var(--border-color)] text-center space-y-2">
+                    <Brain className="w-8 h-8 text-[var(--text-muted)] mx-auto opacity-70" aria-hidden="true" />
+                    <p className="text-xs text-[var(--text-muted)] max-w-md mx-auto leading-relaxed">
+                      Your resume is securely stored in private storage. Click <strong>"Extract Skills with AI"</strong> to run Groq Cloud AI analysis and extract your initial technical skill profile.
+                    </p>
+                  </div>
+                )}
+              </div>
+
               {/* Honest Roadmap Note */}
               <div className="p-3.5 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-color)] flex items-start gap-2.5 text-xs text-[var(--text-muted)]">
                 <Info className="w-4 h-4 text-[var(--accent-color)] shrink-0 mt-0.5" aria-hidden="true" />
                 <p className="leading-relaxed">
-                  <strong>What happens next:</strong> Automatic resume parsing, skill extraction, and
-                  gap calculation are scheduled for <strong>Phase 6 &amp; 8</strong>. No mock analysis
-                  or fake scores are generated here.
+                  <strong>What happens next:</strong> AI skill extraction (<strong>Phase 6</strong>) analyzes your resume to infer baseline scores. Diagnostic testing (<strong>Phase 7</strong>) and skill gap calculation (<strong>Phase 8</strong>) will verify your knowledge and measure missing industry skills.
                 </p>
               </div>
+
 
               {/* Existing Actions */}
               <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[var(--border-color)]">

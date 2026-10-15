@@ -13,8 +13,8 @@ A minor project submitted in partial fulfilment of the requirements for the degr
 
 ## Project Status
 
-**Status: Phase 5 complete**
-*(Firebase Authentication, target career selection, private Supabase Storage resume management, and in-memory PDF/DOCX text extraction pipeline with sanitization, whitespace normalization, and 34 verified backend tests.)*
+**Status: Phase 6 complete**
+*(Firebase Authentication, target career selection, private Supabase Storage resume management, in-memory PDF/DOCX text extraction pipeline, and AI Skill Extraction via Groq Cloud API with 44 verified backend tests.)*
 
 ---
 
@@ -26,7 +26,7 @@ A minor project submitted in partial fulfilment of the requirements for the degr
 - **`/forgot-password`** — Password Reset (Guest route dispatching password recovery instructions via Firebase Auth).
 - **`/dashboard`** — User Profile & Setup Dashboard (Protected route displaying profile, active career, and resume status).
 - **`/career`** — Career Selection (Protected route with keyboard-operable radio cards, benchmark skills, and confirmation).
-- **`/resume`** — Resume Upload & Private Storage (Protected route with drag-drop, consent, replace, and delete).
+- **`/resume`** — Resume Upload, Storage & AI Skill Extraction (Protected route with drag-drop, consent, replace, delete, and Groq AI analysis).
 - **`/setup-check`** — System Health Check (Live API verification endpoint).
 - **`*`** — 404 Catch-All Page Not Found.
 
@@ -44,6 +44,8 @@ A minor project submitted in partial fulfilment of the requirements for the degr
 - **`POST /api/resume`** — Protected: Multipart upload to private Cloud Storage (`resumes/{uid}/{randomId}`) with consent and metadata.
 - **`PUT /api/resume`** — Protected: Multipart replacement of stored resume with atomic metadata update and old object cleanup.
 - **`DELETE /api/resume`** — Protected: Permanently deletes stored resume object and metadata for caller.
+- **`POST /api/resume/analyze`** — Protected: Extracts and infers technical skills from uploaded resume using Groq Cloud API (`groq-sdk`).
+
 
 ---
 
@@ -200,9 +202,10 @@ The project relies strictly on a modern, free-tier friendly full-stack architect
   - Cloud Firestore (NoSQL document database for user profiles, roadmaps, and progress)
 
 - **Artificial Intelligence:**
-  - Google Gemini API via official SDK (`@google/genai`)
+  - Groq Cloud API via official SDK (`groq-sdk`)
   - Called **ONLY** from the backend server
-  - Model configured via environment variable `GEMINI_MODEL`
+  - Model configured via environment variable `GROQ_MODEL` (default: `llama-3.3-70b-versatile`)
+
 
 ---
 

@@ -6,6 +6,7 @@ import {
   createMyResume,
   replaceMyResume,
   deleteMyResume,
+  analyzeMyResume,
 } from '../controllers/resume.controller.js';
 
 const router = Router();
@@ -18,5 +19,8 @@ router.get('/', getMyResume);
 router.post('/', handleResumeUpload, createMyResume);
 router.put('/', handleResumeUpload, replaceMyResume);
 router.delete('/', deleteMyResume);
+
+// AI Skill Extraction (Groq Cloud API)
+router.post('/analyze', analyzeMyResume);
 
 export default router;

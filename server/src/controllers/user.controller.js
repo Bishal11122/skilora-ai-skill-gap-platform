@@ -24,10 +24,13 @@ function formatUserProfile(data) {
     email: data.email || '',
     selectedCareerId: data.selectedCareerId || null,
     selectedCareerAt: data.selectedCareerAt ? toIso(data.selectedCareerAt) : null,
+    extractedSkills: Array.isArray(data.extractedSkills) ? data.extractedSkills : [],
+    skillsExtractedAt: data.skillsExtractedAt ? toIso(data.skillsExtractedAt) : null,
     createdAt: toIso(data.createdAt),
     updatedAt: toIso(data.updatedAt),
   };
 }
+
 
 /**
  * GET /api/users/me
