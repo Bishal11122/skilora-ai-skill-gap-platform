@@ -11,7 +11,6 @@ import {
   X,
   Compass,
   AlertTriangle,
-  Info,
   Clock,
   HardDrive,
   Sparkles,
@@ -275,6 +274,14 @@ export default function ResumeUploadPage() {
     setConsentChecked(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
     setSuccessMessage('Resume and stored metadata have been deleted completely.');
+
+    try {
+      if (typeof refreshProfile === 'function') {
+        await refreshProfile();
+      }
+    } catch {
+      // Non-blocking fallback
+    }
   };
 
   const handleAnalyzeResume = async () => {
@@ -303,6 +310,15 @@ export default function ResumeUploadPage() {
       setSuccessMessage(
         `AI Skill Extraction complete! Detected ${data.skills.length} technical skills from your resume.`
       );
+
+      // Refresh user profile so AuthContext has latest extractedSkills
+      try {
+        if (typeof refreshProfile === 'function') {
+          await refreshProfile();
+        }
+      } catch {
+        // Non-blocking fallback
+      }
     }
   };
 
@@ -323,18 +339,12 @@ export default function ResumeUploadPage() {
       <Container size="default">
         <div className="max-w-3xl mx-auto space-y-8">
           {/* Header */}
-          <div className="text-center space-y-3">
-            <div className="inline-flex items-center gap-2">
-              <Badge variant="plum">Phase 5 Milestone</Badge>
-              <Badge variant="sage">Private Storage</Badge>
-            </div>
-            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-[var(--text-main)]">
+          <div className="text-center space-y-2">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-main)]">
               Upload Your Technical Resume
             </h1>
-            <p className="text-xs sm:text-sm text-[var(--text-muted)] max-w-xl mx-auto leading-relaxed">
-              Your resume is stored privately in encrypted cloud storage for your account only. It will
-              be used in later phases for AI skill extraction and gap analysis against your target
-              career benchmark.
+            <p className="text-xs sm:text-sm text-[var(--text-muted)] max-w-lg mx-auto">
+              Upload your PDF or DOCX resume to automatically detect your technical skills and compare them against your career benchmark.
             </p>
           </div>
 
@@ -544,18 +554,33 @@ export default function ResumeUploadPage() {
                 )}
               </div>
 
-              {/* Honest Roadmap Note */}
-              <div className="p-3.5 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-color)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-[var(--text-muted)]">
+              {/* Learning-First User Journey: Next Step is Skill Gap Analysis */}
+              <div className="p-4 rounded-xl bg-[var(--surface-elevated)] border border-[var(--primary-color)]/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-xs text-[var(--text-muted)] shadow-sm">
                 <div className="flex items-start gap-2.5">
-                  <Info className="w-4 h-4 text-[var(--accent-color)] shrink-0 mt-0.5" aria-hidden="true" />
-                  <p className="leading-relaxed">
-                    <strong>What happens next:</strong> AI skill extraction (<strong>Phase 6</strong>) infers baseline scores. Verify your real technical competency with the 10-minute <strong>Phase 7 Diagnostic Assessment</strong>.
-                  </p>
+                  <Sparkles className="w-4 h-4 text-[var(--primary-color)] shrink-0 mt-0.5" aria-hidden="true" />
+                  <div className="space-y-1">
+                    <p className="font-semibold text-[var(--text-main)] text-sm">
+                      Next Step: Analyze Your Skill Gaps
+                    </p>
+                    <p className="leading-relaxed">
+                      Your technical competencies have been extracted from your resume. Compare them against industry benchmarks for <strong>{targetCareerName || 'your target role'}</strong> to identify your priority learning gaps.
+                    </p>
+                    <p className="text-[11px] text-[var(--text-muted)]/80">
+                      <em>Optional:</em> You can also take our diagnostic test anytime to calibrate verified baseline scores.
+                    </p>
+                  </div>
                 </div>
-                <Button to="/assessment" variant="primary" size="sm" className="shrink-0 text-xs self-start sm:self-center">
-                  Take Assessment
-                  <ArrowRight className="w-3.5 h-3.5 ml-1" />
-                </Button>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
+                  <Button
+                    to="/dashboard#skill-gaps"
+                    variant="primary"
+                    size="sm"
+                    className="text-xs justify-center"
+                  >
+                    Analyze My Skill Gaps
+                    <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                  </Button>
+                </div>
               </div>
 
 
@@ -647,13 +672,12 @@ export default function ResumeUploadPage() {
                 </label>
 
                 <div
-                  className={`relative p-6 sm:p-8 rounded-2xl border-2 border-dashed transition-all text-center flex flex-col items-center justify-center space-y-3 ${
-                    fileError
+                  className={`relative p-6 sm:p-8 rounded-2xl border-2 border-dashed transition-all text-center flex flex-col items-center justify-center space-y-3 ${fileError
                       ? 'border-[var(--danger-color)]/50 bg-[var(--danger-color)]/[0.03]'
                       : selectedFile
-                      ? 'border-[var(--primary-color)] bg-[var(--primary-color)]/[0.03]'
-                      : 'border-[var(--border-color)] bg-[var(--surface-elevated)] hover:border-[var(--primary-color)]/60'
-                  }`}
+                        ? 'border-[var(--primary-color)] bg-[var(--primary-color)]/[0.03]'
+                        : 'border-[var(--border-color)] bg-[var(--surface-elevated)] hover:border-[var(--primary-color)]/60'
+                    }`}
                 >
                   <input
                     id="resume-file-input"

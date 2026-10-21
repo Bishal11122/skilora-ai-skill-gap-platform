@@ -10,7 +10,7 @@ export default function Card({
   ...props
 }) {
   const hoverStyles = hover
-    ? 'hover:-translate-y-1 hover:border-[var(--primary-color)]/35 hover:shadow-md transition-all duration-200'
+    ? 'hover:border-[var(--primary-color)]/40 hover:shadow-sm transition-all duration-150'
     : '';
 
   const variantStyles = {
@@ -20,7 +20,7 @@ export default function Card({
 
   return (
     <div
-      className={`border rounded-2xl p-6 shadow-xs ${variantStyles[variant] || variantStyles.default} ${hoverStyles} ${className}`}
+      className={`border rounded-xl p-5 sm:p-6 shadow-xs ${variantStyles[variant] || variantStyles.default} ${hoverStyles} ${className}`}
       {...props}
     >
       {children}

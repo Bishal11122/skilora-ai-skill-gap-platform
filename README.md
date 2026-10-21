@@ -155,16 +155,16 @@ This platform solves that problem by using Artificial Intelligence to:
 
 ## 9-Step User Workflow
 
-The platform follows a strict 9-step sequence:
+The platform follows a structured 9-step sequence:
 1. **Register/Login** — User creates an account or logs in securely.
 2. **Select Career** — User picks their target career path (e.g., Full Stack Developer).
-3. **Upload Resume** — User submits their resume for analysis (resumes are not stored permanently).
+3. **Upload Resume** — User submits their resume for analysis (resumes are processed in-memory and not stored permanently).
 4. **Extract Skills (AI)** — AI reads the resume and extracts current technical skills.
-5. **Take Assessment** — User completes questions to verify their current knowledge level.
-6. **Find Skill Gap** — System computes the exact gap between required and current skill levels.
-7. **Create Roadmap (AI)** — AI builds a structured, step-by-step learning roadmap tailored to the biggest gaps.
-8. **Learn & Practice** — User studies recommended courses, videos, and documentation, and tests understanding with AI quizzes.
-9. **Track Progress** — System tracks completed roadmap topics and displays live visual progress on the dashboard.
+5. **Analyze Skill Gaps** — System computes exact gaps between role benchmarks and learner skills (`Skill Gap = Benchmark - Effective`).
+6. **Create Roadmap (AI)** — AI builds a structured, step-by-step learning roadmap tailored to prioritized gaps.
+7. **Curated Learning Resources** — User studies authoritative, vetted documentation, guides, and reputable free materials.
+8. **Practice & Skill Quizzes** — User tests understanding with targeted, skill-specific quizzes to prove technical competence.
+9. **Track Progress & Recalibrate** — System tracks completed milestones and dynamically updates readiness on the dashboard.
 
 ---
 

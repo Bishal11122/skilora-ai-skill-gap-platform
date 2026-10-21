@@ -51,9 +51,9 @@ The project is broken down into 13 key functional modules across 14 implementati
 - **Source:** Enhancement *(beyond the initial project report for better user experience)*
 - **Implementing Phase:** Phase 14
 - **User Story:**  
-  *As a newly registered student, I want a brief, lightweight 2-step onboarding screen, so that I understand what steps are coming next before jumping straight into career selection.*
+  *As a newly registered student, I want a brief, lightweight onboarding screen, so that I understand what steps are coming next before jumping straight into career selection.*
 - **Main Features:**
-  - Brief welcome modal/screen explaining the upcoming steps (Select Career → Upload Resume → Assessment).
+  - Brief welcome modal/screen explaining the learning-first steps (Select Career → Upload Resume → Skill Gaps → Roadmap).
   - Option to start immediately or review quick tips.
   - Persistent state in Firestore so existing users skip onboarding on subsequent logins.
 
@@ -81,19 +81,21 @@ The project is broken down into 13 key functional modules across 14 implementati
   - Backend text extraction pipeline.
   - Strict privacy handling: uploaded resumes are processed in-memory or in temporary storage and deleted immediately (never stored permanently).
   - Security filtering: resume text is treated strictly as untrusted user input and never as system instructions.
+  - Learning-first progression: after resume extraction, users are guided directly to Skill Gap Analysis.
 
 ---
 
-### Module 6: Skill Assessment
+### Module 6: Diagnostic Assessment (Optional Baseline Calibration)
 - **Source:** Project Report
-- **Implementing Phase:** Phase 7
+- **Implementing Phase:** Phase 7 (Preserved & Optional)
 - **User Story:**  
-  *As a student, I want to take a brief diagnostic assessment on my extracted or declared skills, so that my current skill levels can be verified accurately.*
+  *As a student, I can optionally take a brief diagnostic assessment on my extracted or declared skills to calibrate my baseline levels, or proceed directly to skill gap analysis and personalized learning.*
 - **Main Features:**
   - Multiple-choice assessment questions matched to the skills detected from the resume and target career.
   - Question presentation with timer and answer selection.
   - Objective scoring that converts test performance into a validated score (0–100 scale).
   - Clear source tagging (marks skills as `assessment-verified` vs. `resume-inferred`).
+  - Coexists with future skill-specific quizzes (Module 10); remains non-mandatory in the learning-first flow.
 
 ---
 
@@ -119,7 +121,7 @@ The project is broken down into 13 key functional modules across 14 implementati
 - **User Story:**  
   *As a student, I want an AI-generated step-by-step learning path built specifically around my largest skill gaps, so that I don't waste time studying concepts I already know.*
 - **Main Features:**
-  - Backend integration with the Gemini API to construct sequential learning topics.
+  - Backend integration via existing Groq Cloud API service (`groq.service.js` with `llama-3.3-70b-versatile`) to construct sequential learning topics.
   - Logical topic sequencing (e.g., Node.js Basics → Express.js → REST API → Database → Backend Project).
   - Step breakdown with estimated completion times and topic descriptions.
   - Storage of the generated roadmap in Cloud Firestore under the user's document.
@@ -132,9 +134,10 @@ The project is broken down into 13 key functional modules across 14 implementati
 - **User Story:**  
   *As a student, I want recommended free courses, documentation links, and video tutorials for each roadmap topic, so that I have the right study materials in one place.*
 - **Main Features:**
+  - Curated, authoritative static resource dataset with verified official documentation URLs (e.g., MDN, official docs, reputable free resources).
   - Recommendation engine based on the rule: `Skill Gap + User Level + Topic`.
   - Filtered resource cards: Courses, Video Tutorials, Official Documentation, and Practice Projects.
-  - External link opening with safe navigation attributes.
+  - External link opening with safe navigation attributes (`noopener noreferrer`).
 
 ---
 
@@ -142,12 +145,12 @@ The project is broken down into 13 key functional modules across 14 implementati
 - **Source:** Project Report
 - **Implementing Phase:** Phase 11
 - **User Story:**  
-  *As a student, I want to take an AI-generated quiz after studying a roadmap topic and receive constructive feedback, so that I can verify my understanding and fix my weak areas.*
+  *As a student, I want to take a focused quiz after studying a roadmap topic and receive constructive feedback, so that I can verify my understanding and fix my weak areas.*
 - **Main Features:**
-  - Backend Gemini API generation of dynamic 5-to-10 question multiple-choice quizzes tailored to the specific topic and student level.
-  - Automatic scoring (e.g., 7 out of 10).
-  - AI-generated constructive feedback explaining what concepts were missed and what to review next.
-  - Update of the student's skill score and mastery status upon passing.
+  - Dynamic 5-to-10 question multiple-choice quizzes tailored to the specific topic and student level.
+  - Automatic scoring and quiz attempt history preservation.
+  - Constructive feedback explaining what concepts were missed and what to review next.
+  - Skill score updates adhering to defined scoring policies and evidence precedence without treating a single pass as unverified complete mastery.
 
 ---
 

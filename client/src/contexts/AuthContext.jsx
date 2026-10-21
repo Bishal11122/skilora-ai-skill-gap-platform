@@ -242,12 +242,12 @@ export function AuthProvider({ children }) {
     return updatedProfile;
   };
 
-  const refreshProfile = async () => {
+  const refreshProfile = useCallback(async () => {
     if (user) {
       return await syncProfile(user);
     }
     return null;
-  };
+  }, [user, syncProfile]);
 
   const value = {
     user,

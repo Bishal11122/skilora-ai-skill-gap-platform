@@ -5,18 +5,18 @@
 **College:** JNCT Professional University, Bhopal  
 **Authors:** Bishal Sharma, Lakshya Deep  
 **Tagline:** Resume → AI → Skills → Learning → Career  
-**Project Status:** Phase 7 complete (Diagnostic Skill Assessment & Scoring Verification)
+**Project Status:** Phase 8 complete (Skill Gap Calculation Engine & Priority Ranking)
 
 ---
 
 ## 1. System Overview (In Simple English)
 
-The system is built as a modern, decoupled full-stack web application. It connects six core building blocks:
+The system is built as a modern, decoupled full-stack web application. It connects seven core building blocks:
 
 1. **React Frontend (with Vite):**  
-   Runs in the student's web browser. It presents a responsive, modern user interface where students sign in, pick their target career, upload resumes, verify skills through timed diagnostic assessments, and view verified competency ratings.
+   Runs in the student's web browser. It presents a responsive, modern user interface where students sign in, pick their target career, upload resumes, verify skills through timed diagnostic assessments, and view verified competency ratings and real-time skill gaps.
 2. **Node.js + Express Backend:**  
-   Runs on the server. It handles REST API requests from the frontend, verifies user identity via Firebase ID tokens, processes uploaded resumes in memory, runs the diagnostic assessment engine with server-enforced deadlines, and communicates with Cloud Firestore and AI services.
+   Runs on the server. It handles REST API requests from the frontend, verifies user identity via Firebase ID tokens, processes uploaded resumes in memory, runs the diagnostic assessment engine with server-enforced deadlines, executes the deterministic skill-gap calculation engine, and communicates with Cloud Firestore and AI services.
 3. **Firebase Authentication:**  
    Manages student sign-ups and logins securely. When a student logs in, Firebase gives the frontend a cryptographically signed **ID token**. The frontend attaches this token to every request sent to the Express backend.
 4. **Cloud Firestore (Database):**  
@@ -32,6 +32,44 @@ The system is built as a modern, decoupled full-stack web application. It connec
    - Sanitizes question payloads delivered to the client, keeping correct options and educational explanations hidden until after server grading.
    - Prevents duplicate or concurrent submissions using atomic Cloud Firestore transactions.
    - Stores scores with source `assessment-verified` in `users/{uid}.assessedSkills`, strictly preserving `extractedSkills` (source `resume-inferred`).
+7. **Skill Gap Calculation Engine (Phase 8):**
+   A pure, deterministic calculation engine that evaluates real-time skill gaps:
+   - Evaluates each benchmark skill (standard requiredLevel: 80) against best available evidence.
+   - Resolves evidence hierarchy strictly: `assessment-verified` > `resume-inferred` > `none`.
+   - Guarantees zero score fabrication: missing skills have `currentLevel: null` and `effectiveLevel: 0` (formula fallback only), labeled "Not assessed".
+   - Calculates mathematical gap: $\max(0, \text{Required Level} - \text{Effective Level})$ and classifications Small (<15), Medium (15–39), High ($\ge$40).
+   - Sorts learning priorities using a 5-tier deterministic tie-breaker rule.
+   - Computes overall readiness: $\text{round}(100 \times \sum \text{effectiveLevel} / \sum \text{requiredLevel})$.
+   - Exposes authenticated endpoint `GET /api/skills/gap` with dynamic, real-time calculation and zero caching.
+   - **Illustrative API Response (`GET /api/skills/gap`):**
+     ```json
+     {
+       "data": {
+         "careerId": "full-stack-developer",
+         "careerName": "Full Stack Developer",
+         "analyzedAt": "2026-10-17T12:00:00.000Z",
+         "summary": {
+           "totalBenchmarkSkills": 5,
+           "evaluatedSkillsCount": 2,
+           "highGapCount": 4,
+           "mediumGapCount": 0,
+           "smallGapCount": 1,
+           "overallReadinessPercentage": 27,
+           "topPrioritySkill": "PostgreSQL"
+         },
+         "skillGaps": [
+           { "priorityRank": 1, "name": "PostgreSQL", "requiredLevel": 80, "currentLevel": null, "effectiveLevel": 0, "gap": 80, "classification": "High Gap", "classificationCode": "high", "evidenceSource": "none", "hasEvidence": false },
+           { "priorityRank": 2, "name": "REST APIs", "requiredLevel": 80, "currentLevel": null, "effectiveLevel": 0, "gap": 80, "classification": "High Gap", "classificationCode": "high", "evidenceSource": "none", "hasEvidence": false },
+           { "priorityRank": 3, "name": "System Design", "requiredLevel": 80, "currentLevel": null, "effectiveLevel": 0, "gap": 80, "classification": "High Gap", "classificationCode": "high", "evidenceSource": "none", "hasEvidence": false },
+           { "priorityRank": 4, "name": "Node.js", "requiredLevel": 80, "currentLevel": 40, "effectiveLevel": 40, "gap": 40, "classification": "High Gap", "classificationCode": "high", "evidenceSource": "resume-inferred", "hasEvidence": true, "confidence": "medium" },
+           { "priorityRank": 5, "name": "React", "requiredLevel": 80, "currentLevel": 67, "effectiveLevel": 67, "gap": 13, "classification": "Small Gap", "classificationCode": "small", "evidenceSource": "assessment-verified", "hasEvidence": true, "assessmentId": "assess_123" }
+         ],
+         "otherExtractedSkills": [
+           { "name": "Docker", "level": 70, "category": "DevOps", "source": "resume-inferred", "confidence": "medium", "isCareerBenchmark": false }
+         ]
+       }
+     }
+     ```
 
 ---
 
@@ -93,8 +131,10 @@ flowchart TD
     AdminSDK -->|20. Persist assessments & user state| Firestore
     AssessmentEngine -->|21. Return scores & educational review| UI
 
-    %% Future Gap Engine (Phase 8 Pending)
-    AssessmentEngine -.->|22. Verified scores feed Gap Engine| GapEngine
+    %% Skill Gap Engine Flow (Phase 8 Active)
+    UI -->|22. Fetch Gap Analysis GET /api/skills/gap| GapEngine
+    GapEngine -->|23. Read user profile & career benchmarks| AdminSDK
+    GapEngine -->|24. Return calculated gaps, readiness & priorities| UI
     AdminSDK --> Firestore
 ```
 

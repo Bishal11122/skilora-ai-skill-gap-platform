@@ -36,7 +36,7 @@ function getScoreLevel(score) {
 }
 
 export default function AssessmentPage() {
-  const { profile } = useAuth();
+  const { profile, refreshProfile } = useAuth();
   const navigate = useNavigate();
 
   // Primary state
@@ -211,9 +211,18 @@ export default function AssessmentPage() {
       return;
     }
 
+    // Refresh user profile so AuthContext has latest assessedSkills and lastAssessedAt
+    try {
+      if (typeof refreshProfile === 'function') {
+        await refreshProfile();
+      }
+    } catch {
+      // Non-blocking fallback
+    }
+
     setResultData(res.data);
     setViewState('results');
-  }, [assessmentId, questions, userAnswers]);
+  }, [assessmentId, questions, userAnswers, refreshProfile]);
 
   // Format seconds into MM:SS
   const formatTimer = (seconds) => {
@@ -257,10 +266,7 @@ export default function AssessmentPage() {
         {viewState === 'overview' && (
           <div className="max-w-2xl mx-auto space-y-6">
             <div className="space-y-2 text-center">
-              <div className="inline-flex items-center gap-1.5 mb-1">
-                <Badge variant="plum">Phase 7: Diagnostic Assessment</Badge>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-main)] tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-main)] tracking-tight">
                 Verify Your Technical Skills
               </h1>
               <p className="text-xs sm:text-sm text-[var(--text-muted)] max-w-lg mx-auto leading-relaxed">
@@ -663,12 +669,15 @@ export default function AssessmentPage() {
               </div>
 
               <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-                <Button to="/dashboard" variant="primary" size="sm">
-                  View Student Dashboard
+                <Button to="/dashboard#skill-gaps" variant="primary" size="sm">
+                  View Skill Gap Breakdown
                   <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
                 </Button>
+                <Button to="/dashboard" variant="secondary" size="sm">
+                  Dashboard
+                </Button>
                 <Button
-                  variant="secondary"
+                  variant="ghost"
                   size="sm"
                   onClick={handleStartAssessment}
                   disabled={isStarting}
@@ -817,9 +826,18 @@ export default function AssessmentPage() {
 
               <div className="p-4 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-color)] flex items-start gap-2.5 text-xs text-[var(--text-muted)]">
                 <Info className="w-4 h-4 text-[var(--accent-color)] shrink-0 mt-0.5" aria-hidden="true" />
-                <p className="leading-relaxed">
-                  <strong>What happens next:</strong> Diagnostic testing (<strong>Phase 7</strong>) has validated your baseline scores. Skill gap calculation (<strong>Phase 8</strong>) will mathematically compare your verified skill levels against industry benchmarks to prioritize your learning roadmap.
-                </p>
+                <div className="space-y-1">
+                  <p className="leading-relaxed">
+                    <strong>Phase 8 Skill Gap Engine Active:</strong> Diagnostic testing has validated your objective scores. Your skill levels have now been mathematically compared against industry benchmarks to compute your real-time skill gaps.
+                  </p>
+                  <Link
+                    to="/dashboard#skill-gaps"
+                    className="inline-flex items-center gap-1 font-semibold text-[var(--primary-color)] hover:underline mt-1"
+                  >
+                    View your prioritized skill gaps on the Dashboard
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
               </div>
           </div>
         )}

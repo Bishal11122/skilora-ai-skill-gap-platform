@@ -103,7 +103,40 @@ $$\left( \frac{2}{5} \right) \times 100 = 40\%$$
 
 ---
 
-## 8. Honest Limitations & Transparency
+## 8. Overall Career Readiness Percentage (Phase 8)
+
+Career readiness is evaluated by comparing a student's effective skill levels against the benchmark requirements for their target career:
+
+$$\text{Overall Readiness (\%)} = \text{round}\left( 100 \times \frac{\sum \text{Effective Level}}{\sum \text{Required Level}} \right)$$
+
+- Clamped to the range $[0, 100]$.
+- If a benchmark skill has missing evidence, zero score fabrication is enforced: $\text{currentLevel} = \text{null}$ and $\text{effectiveLevel} = 0$.
+
+### Worked Example (Full Stack Developer — 5 Benchmark Skills @ 80):
+
+| Benchmark Skill | Source | Current Level | Effective Level | Required Level | Gap | Gap Classification |
+|---|---|---|---|---|---|---|
+| **React** | `assessment-verified` | 67 | 67 | 80 | 13 | **Small Gap** |
+| **Node.js** | `resume-inferred` | 40 | 40 | 80 | 40 | **High Gap** |
+| **PostgreSQL** | `none` (unassessed) | null | 0 | 80 | 80 | **High Gap** |
+| **REST APIs** | `none` (unassessed) | null | 0 | 80 | 80 | **High Gap** |
+| **System Design** | `none` (unassessed) | null | 0 | 80 | 80 | **High Gap** |
+
+**Calculation:**
+- $\sum \text{Effective Level} = 67 + 40 + 0 + 0 + 0 = 107$
+- $\sum \text{Required Level} = 80 \times 5 = 400$
+- $\text{Overall Readiness (\%)} = \text{round}\left( \frac{100 \times 107}{400} \right) = \text{round}(26.75) = \mathbf{27\%}$
+
+**Gap Summary Counts:**
+- `totalBenchmarkSkills`: 5
+- `evaluatedSkillsCount`: 2
+- `highGapCount`: 4
+- `mediumGapCount`: 0
+- `smallGapCount`: 1
+
+---
+
+## 9. Honest Limitations & Transparency
 
 While the AI-powered scoring system provides helpful direction, we state its scientific limitations honestly:
 

@@ -63,10 +63,10 @@ client/
 └── vite.config.js          # Vite build tool and development server configuration
 ```
 
-### Key Client Highlights (Phase 7):
-- **`src/pages/AssessmentPage.jsx`** — Manages the 3 diagnostic states: Overview, Active Assessment Runner (with server-synchronized timer, 15-question jump navigator, and confirmation modal), and Verified Results (with `assessment-verified` tags and review accordion).
-- **`src/components/ui/Navbar.jsx`** — Provides authenticated access to `/assessment` across desktop and mobile menus.
-- **`src/pages/DashboardPage.jsx`** — Integrates Step 3 into "Your Learning Setup" and displays verified competency cards.
+### Key Client Highlights (Phase 8):
+- **`src/pages/DashboardPage.jsx`** — Integrates real-time Skill Gap Analysis & Learning Priorities card, displaying overall readiness percentage, top learning focus, gap distribution badges (High/Medium/Small), prioritized benchmark skills with "Not assessed" badges for missing evidence, visual comparison bars, and non-benchmark resume skills.
+- **`src/pages/AssessmentPage.jsx`** — Includes "View Skill Gap Breakdown" CTA in verified results view, smoothly scrolling to the dashboard gap section.
+- **`src/components/ui/Navbar.jsx`** — Provides authenticated access to `/assessment` and `/dashboard` across desktop and mobile menus.
 
 ---
 
@@ -81,24 +81,27 @@ server/
 │   │   ├── user.controller.js        # User profile, career selection, and assessed skills
 │   │   ├── career.controller.js      # Benchmark career catalog retrieval
 │   │   ├── resume.controller.js      # Resume storage & Groq AI extraction handlers
-│   │   └── assessment.controller.js  # Phase 7: Assessment session lifecycle, timer, and atomic submission
+│   │   ├── assessment.controller.js  # Phase 7: Assessment session lifecycle, timer, and atomic submission
+│   │   └── skillGap.controller.js    # Phase 8: Real-time skill gap analysis calculation and response formatting
 │   ├── middleware/         # Express middlewares (authenticate.js for Firebase ID tokens, error handlers)
 │   ├── routes/             # Express router definitions mapping API endpoints to controllers
 │   │   ├── index.js                  # Master API router mounting sub-routes
 │   │   ├── user.routes.js            # User profile endpoints
 │   │   ├── career.routes.js          # Career benchmark endpoints
 │   │   ├── resume.routes.js          # Resume management & AI extraction routes
-│   │   └── assessment.routes.js      # Phase 7: Diagnostic assessment routes (/status, /start, /submit, /result)
+│   │   ├── assessment.routes.js      # Phase 7: Diagnostic assessment routes (/status, /start, /submit, /result)
+│   │   └── skillGap.routes.js        # Phase 8: Skill gap routes (/gap)
 │   ├── services/           # Integration services for Groq Cloud API, Supabase Storage, and PDF/DOCX parsing
 │   │   ├── groq.service.js           # Groq Cloud API integration for structured JSON skill extraction
 │   │   ├── supabaseStorage.service.js# Private object storage in resumes bucket
-│   │   └── resumeParser.service.js   # PDF and DOCX text extraction
+│   │   ├── resumeParser.service.js   # PDF and DOCX text extraction
+│   │   └── skillGapEngine.service.js # Phase 8: Pure deterministic calculation engine, precedence resolution & priority ranking
 │   ├── validators/         # Zod schemas for request validation
 │   │   ├── user.validator.js         # User update and career selection schemas
 │   │   ├── resume.validator.js       # File signature and consent schemas
 │   │   └── assessment.validator.js   # Phase 7: Assessment submission schema validation
 │   ├── data/               # Static benchmark datasets & question banks
-│   │   ├── careerBenchmarks.js       # 5 career benchmark profiles with 5 skills each
+│   │   ├── careerBenchmarks.js       # Phase 8: 5 career benchmark profiles with 5 skills each (requiredLevel: 80)
 │   │   └── diagnosticQuestions.js    # Phase 7: 75 deterministic questions across 5 careers, sanitization & grading
 │   ├── utils/              # Helper utilities (textSanitizer.js)
 │   └── app.js              # Express application setup, middleware configuration, and router mounting
@@ -108,15 +111,16 @@ server/
 │   ├── groqSkillExtraction.test.js   # Groq AI extraction unit & mock tests
 │   ├── resumeParsing.test.js         # PDF/DOCX parsing tests
 │   ├── supabaseStorage.test.js       # Supabase private storage tests
-│   └── assessment.test.js            # Phase 7: 12 tests covering question bank, timer, transactions, and grading
+│   ├── assessment.test.js            # Phase 7: 12 tests covering question bank, timer, transactions, and grading
+│   └── skillGapEngine.test.js        # Phase 8: 27 offline unit & integration tests covering pure calculations, tie-breakers & API
 ├── uploads/                # Temporary local directory for in-flight resume processing (never tracked in Git)
 ├── .env.example            # Template for backend secrets (PORT, GROQ_API_KEY, GROQ_MODEL, etc.)
 ├── package.json            # Server dependencies (Express, groq-sdk, firebase-admin, multer, cors, dotenv, zod)
 └── server.js               # Server entry point that initializes ports and begins listening for requests
 ```
 
-### Key Server Highlights (Phase 7):
-- **`src/data/diagnosticQuestions.js`** — Deterministic question bank containing 15 questions per career for all 5 careers, sanitization utility `sanitizeQuestionsForClient()`, and grading utility `gradeAssessmentSubmission()`.
-- **`src/controllers/assessment.controller.js`** — Enforces user ownership, 10-minute server timer (+ 15s grace), duplicate prevention, and atomic Cloud Firestore transactions for submission persistence.
-- **`src/validators/assessment.validator.js`** — Validates submission payload structure and option indices (`0..3`).
-- **`test/assessment.test.js`** — 12 automated unit and integration tests verifying question bank coverage, answer key stripping, integer score rounding, timer deadlines, and atomic concurrency handling.
+### Key Server Highlights (Phase 8):
+- **`src/services/skillGapEngine.service.js`** — Pure deterministic engine implementing evidence precedence (`assessment-verified` > `resume-inferred` > `none`), zero-fabrication missing evidence (`currentLevel: null`, `effectiveLevel: 0`), gap formula ($\max(0, \text{Required} - \text{Effective})$), Small/Medium/High classifications, 5-tier deterministic tie-breakers, and documented readiness formula: $\text{round}(100 \times \sum \text{effectiveLevel} / \sum \text{requiredLevel})$.
+- **`src/controllers/skillGap.controller.js` & `src/routes/skillGap.routes.js`** — Authenticated endpoint `GET /api/skills/gap` computing real-time results from user Firestore profile with zero caching.
+- **`src/data/careerBenchmarks.js`** — Canonical benchmark dataset across all 5 active career tracks with standardized `requiredLevel: 80`.
+- **`test/skillGapEngine.test.js`** — 27 automated unit and integration tests verifying gap formulas, classifications, precedence overrides, tie-breaker ordering, readiness rounding, and controller API contracts.

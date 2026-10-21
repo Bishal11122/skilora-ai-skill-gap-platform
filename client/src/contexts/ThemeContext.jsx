@@ -19,8 +19,8 @@ export function ThemeProvider({ children }) {
     } catch {
       // localStorage may be disabled or restricted in private browsing
     }
-    // Default to dark theme for first-time visitors
-    return 'dark';
+    // Default to clean light SaaS theme for first-time visitors
+    return 'light';
   });
 
   useEffect(() => {
