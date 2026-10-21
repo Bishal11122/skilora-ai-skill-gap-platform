@@ -42,7 +42,52 @@ export function validateUserProfile(req, res, next) {
   next();
 }
 
+/**
+ * Zod schema for account deletion confirmation.
+ * - Requires explicit confirmation string matching 'DELETE' or 'DELETE_MY_ACCOUNT'
+ * - strict(): rejects unknown fields
+ */
+export const accountDeletionSchema = z
+  .object({
+    confirmation: z
+      .string({
+        required_error: 'Explicit confirmation is required to delete your account and all personal data',
+        invalid_type_error: 'Confirmation must be a string',
+      })
+      .trim()
+      .refine((val) => val === 'DELETE' || val === 'DELETE_MY_ACCOUNT', {
+        message: 'Confirmation must be DELETE or DELETE_MY_ACCOUNT',
+      }),
+  })
+  .strict({
+    message: 'Unknown fields are not allowed in the request body',
+  });
+
+/**
+ * Express middleware to validate request body against accountDeletionSchema.
+ */
+export function validateAccountDeletion(req, res, next) {
+  const result = accountDeletionSchema.safeParse(req.body);
+
+  if (!result.success) {
+    const firstIssue = result.error.issues[0];
+    const message = firstIssue?.message || 'Invalid request body';
+
+    return res.status(400).json({
+      error: {
+        message,
+        code: 'CONFIRMATION_REQUIRED',
+      },
+    });
+  }
+
+  req.validatedBody = result.data;
+  next();
+}
+
 export default {
   userProfileSchema,
   validateUserProfile,
+  accountDeletionSchema,
+  validateAccountDeletion,
 };

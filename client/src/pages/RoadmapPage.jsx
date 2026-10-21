@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   Compass,
   Sparkles,
@@ -13,6 +14,7 @@ import {
   ChevronUp,
   BookOpen,
   ExternalLink,
+  HelpCircle,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { getAuth, postAuth, patchAuth } from '../services/api';
@@ -23,6 +25,7 @@ import Badge from '../components/ui/Badge';
 
 export default function RoadmapPage() {
   const { profile } = useAuth();
+  const [searchParams] = useSearchParams();
 
   const [roadmap, setRoadmap] = useState(null);
   const [resourcesData, setResourcesData] = useState(null);
@@ -32,7 +35,7 @@ export default function RoadmapPage() {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
 
-  // Expanded state for milestones: only Step 1 expanded by default
+  // Expanded state for milestone accordions
   const [expandedMilestones, setExpandedMilestones] = useState({ 1: true });
 
   // Fetch active roadmap and associated curated resources
@@ -50,13 +53,39 @@ export default function RoadmapPage() {
         setError(roadmapRes.error);
         setRoadmap(null);
       } else if (roadmapRes.data?.hasRoadmap && roadmapRes.data.roadmap) {
+        const milestones = roadmapRes.data.roadmap.milestones || [];
         setRoadmap(roadmapRes.data.roadmap);
-        // Expand first in-progress or not-started milestone
-        const activeM =
-          roadmapRes.data.roadmap.milestones.find((m) => m.status === 'in-progress') ||
-          roadmapRes.data.roadmap.milestones.find((m) => m.status === 'not-started');
-        if (activeM) {
-          setExpandedMilestones({ [activeM.order]: true });
+
+        // Check if navigated from deep-link with target skill
+        const targetSkill = searchParams.get('skill');
+        let matchedMilestone = null;
+
+        if (targetSkill) {
+          const normTarget = targetSkill.toLowerCase().replace(/[^a-z0-9]/g, '');
+          matchedMilestone = milestones.find((m) => {
+            const normSkill = (m.skillName || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+            const normTitle = (m.title || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+            return normSkill === normTarget || normTitle.includes(normTarget) || normTarget.includes(normSkill);
+          });
+        }
+
+        if (matchedMilestone) {
+          setExpandedMilestones({ [matchedMilestone.order]: true });
+          setTimeout(() => {
+            const el = document.getElementById(`milestone-${matchedMilestone.order}`);
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }, 150);
+        } else {
+          // Auto-expand first in-progress or not-started milestone
+          const activeM =
+            milestones.find((m) => m.status === 'in-progress') ||
+            milestones.find((m) => m.status === 'not-started') ||
+            milestones[0];
+          if (activeM) {
+            setExpandedMilestones({ [activeM.order]: true });
+          }
         }
       } else {
         setRoadmap(null);
@@ -71,7 +100,7 @@ export default function RoadmapPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     fetchRoadmapAndResources();
@@ -101,7 +130,7 @@ export default function RoadmapPage() {
     }
   };
 
-  // Toggle milestone status
+  // Toggle milestone status (persisted to Firestore)
   const handleStatusChange = async (order, newStatus) => {
     setUpdatingOrder(order);
     try {
@@ -121,7 +150,7 @@ export default function RoadmapPage() {
     }
   };
 
-  // Toggle individual topic completion
+  // Toggle individual topic completion (persisted to Firestore)
   const handleToggleTopic = async (order, topicIndex, currentCompleted) => {
     setUpdatingOrder(`${order}-${topicIndex}`);
     try {
@@ -149,12 +178,17 @@ export default function RoadmapPage() {
     }));
   };
 
-  // Primary action button handler
-  const handlePrimaryAction = (m) => {
+  // Primary action button handler on milestone card
+  const handleMilestoneAction = (m) => {
     if (m.status === 'not-started') {
       handleStatusChange(m.order, 'in-progress');
-    } else {
-      setExpandedMilestones((prev) => ({ ...prev, [m.order]: true }));
+    }
+    setExpandedMilestones((prev) => ({ ...prev, [m.order]: true }));
+
+    // Scroll card into view smoothly
+    const el = document.getElementById(`milestone-${m.order}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   };
 
@@ -165,12 +199,31 @@ export default function RoadmapPage() {
     return match?.resources || [];
   };
 
+  // Identify next recommended milestone using existing priority order
+  const nextRecommendedMilestone =
+    roadmap?.milestones?.find((m) => m.status === 'in-progress') ||
+    roadmap?.milestones?.find((m) => m.status === 'not-started') ||
+    roadmap?.milestones?.[0] ||
+    null;
+
+  // Single-sentence explanation of why the skill is recommended
+  const getRecommendationReason = (m) => {
+    if (!m) return '';
+    if (m.status === 'in-progress') {
+      return `You are currently studying ${m.skillName}—complete its next topic to advance toward your target ${m.requiredLevel}% benchmark proficiency.`;
+    }
+    if (m.order === 1) {
+      return `${m.skillName} has your largest benchmark gap (Δ ${m.gap}), making it the most critical foundational skill to master first.`;
+    }
+    return `Step #${m.order} in your personalized curriculum to close your ${m.gapClassification.toLowerCase()} in ${m.skillName}.`;
+  };
+
   return (
     <div className="py-8 sm:py-12 min-h-[75vh]">
       <Container size="narrow">
         <div className="space-y-6">
           {/* ===================================================================
-              A. SIMPLE PAGE INTRODUCTION
+              PAGE HEADER
              =================================================================== */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-[var(--border-color)]">
             <div className="space-y-1">
@@ -178,11 +231,11 @@ export default function RoadmapPage() {
                 Your Learning Roadmap
               </h1>
               <p className="text-xs sm:text-sm text-[var(--text-muted)]">
-                Prioritised step-by-step path for{' '}
+                Step-by-step curriculum for{' '}
                 <strong className="text-[var(--text-main)] font-semibold">
                   {profile?.selectedCareerId || 'your target career'}
                 </strong>
-                , focused on closing your highest-priority skill gaps.
+                , prioritized to close your highest skill gaps first.
               </p>
             </div>
 
@@ -295,15 +348,57 @@ export default function RoadmapPage() {
           )}
 
           {/* ===================================================================
-              B. ACTIVE ROADMAP & CLEAR MILESTONE CARDS
+              ACTIVE ROADMAP JOURNEY
              =================================================================== */}
           {!loading && roadmap && (
             <div className="space-y-6">
-              {/* Compact Overall Progress Indicator */}
-              <div className="p-4 rounded-xl bg-[var(--surface-color)] border border-[var(--border-color)] shadow-xs space-y-2">
+              {/* 1. COMPACT "YOUR NEXT STEP" SECTION */}
+              {nextRecommendedMilestone && (
+                <Card className="p-4 sm:p-5 border-[var(--border-color)] bg-[var(--surface-color)] shadow-xs">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--primary-color)] flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5" />
+                          Your Next Step
+                        </span>
+                        <Badge
+                          variant={nextRecommendedMilestone.status === 'in-progress' ? 'indigo' : 'neutral'}
+                          className="text-[10px] py-0"
+                        >
+                          Step #{nextRecommendedMilestone.order}
+                        </Badge>
+                      </div>
+
+                      <h2 className="text-sm sm:text-base font-bold text-[var(--text-main)]">
+                        {nextRecommendedMilestone.skillName}
+                      </h2>
+
+                      <p className="text-xs text-[var(--text-muted)] max-w-xl">
+                        {getRecommendationReason(nextRecommendedMilestone)}
+                      </p>
+                    </div>
+
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => handleMilestoneAction(nextRecommendedMilestone)}
+                      className="shrink-0 self-start sm:self-center text-xs"
+                    >
+                      {nextRecommendedMilestone.status === 'in-progress'
+                        ? 'Continue learning'
+                        : 'Start learning'}
+                      <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                    </Button>
+                  </div>
+                </Card>
+              )}
+
+              {/* 4. OVERALL ROADMAP PROGRESS BAR */}
+              <div className="p-3.5 rounded-xl bg-[var(--surface-color)] border border-[var(--border-color)] shadow-xs space-y-2">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-semibold text-[var(--text-main)]">
-                    Overall Roadmap Progress
+                    Roadmap Milestone Completion
                   </span>
                   <span className="font-mono font-bold text-[var(--primary-color)]">
                     {roadmap.summary.progressPercentage}%
@@ -321,11 +416,11 @@ export default function RoadmapPage() {
                   <span>
                     {roadmap.summary.completedMilestones} of {roadmap.summary.totalMilestones} milestones completed
                   </span>
-                  <span>~{roadmap.summary.totalEstimatedWeeks} weeks estimated duration</span>
+                  <span>Estimated duration: ~{roadmap.summary.totalEstimatedWeeks} weeks</span>
                 </div>
               </div>
 
-              {/* Milestone Cards in Priority Order */}
+              {/* 2 & 3. CLEAR MILESTONE CARDS WITH GUIDED INTERACTION */}
               <div className="space-y-3">
                 {roadmap.milestones.map((m) => {
                   const isCompleted = m.status === 'completed';
@@ -335,9 +430,15 @@ export default function RoadmapPage() {
                   const milestoneResources = getMilestoneResources(m.order);
                   const completedTopicsCount = m.topics?.filter((t) => t.completed).length || 0;
                   const totalTopicsCount = m.topics?.length || 0;
+                  const topicPercentage =
+                    totalTopicsCount > 0 ? Math.round((completedTopicsCount / totalTopicsCount) * 100) : 0;
+
+                  // Find index of first uncompleted topic (the "Up Next" topic)
+                  const nextTopicIndex = m.topics?.findIndex((t) => !t.completed);
 
                   return (
                     <Card
+                      id={`milestone-${m.order}`}
                       key={m.order}
                       className={`p-4 sm:p-5 transition-all border ${
                         isCompleted
@@ -347,10 +448,10 @@ export default function RoadmapPage() {
                           : 'bg-[var(--surface-color)] border-[var(--border-color)] shadow-xs'
                       } space-y-3`}
                     >
-                      {/* Top Row: Step, Skill, Levels, Status, Actions */}
+                      {/* Top Row: Step Number, Skill Name, Status & Priority */}
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div className="flex items-start sm:items-center gap-3">
-                          {/* Step Number Circle */}
+                          {/* Step Number Badge */}
                           <div
                             className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
                               isCompleted
@@ -368,6 +469,8 @@ export default function RoadmapPage() {
                               <h3 className="text-sm sm:text-base font-bold text-[var(--text-main)]">
                                 {m.skillName}
                               </h3>
+
+                              {/* Priority Indicator */}
                               <Badge
                                 variant={
                                   m.gapClassification === 'High Gap'
@@ -380,25 +483,43 @@ export default function RoadmapPage() {
                               >
                                 {m.gapClassification}
                               </Badge>
+
+                              {/* Concise Status Indicator */}
+                              <Badge
+                                variant={isCompleted ? 'success' : isInProgress ? 'indigo' : 'neutral'}
+                                className="text-[10px] py-0 capitalize"
+                              >
+                                {m.status.replace('-', ' ')}
+                              </Badge>
                             </div>
 
+                            {/* Distinct Labels: Current Proficiency & Target Benchmark */}
                             <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] flex-wrap">
                               <span>
-                                Current:{' '}
-                                <strong className="text-[var(--text-main)]">
-                                  {m.currentLevel !== null ? `${m.currentLevel}%` : 'Not assessed'}
-                                </strong>
+                                Current proficiency:{' '}
+                                {m.currentLevel !== null ? (
+                                  <strong className="text-[var(--text-main)] font-semibold">
+                                    {m.currentLevel}%
+                                  </strong>
+                                ) : (
+                                  <span className="text-amber-700 dark:text-amber-400 font-medium">
+                                    Not yet measured
+                                  </span>
+                                )}
                               </span>
                               <span>•</span>
                               <span>
-                                Target: <strong className="text-[var(--text-main)]">{m.requiredLevel}%</strong>
+                                Target benchmark:{' '}
+                                <strong className="text-[var(--text-main)] font-semibold">
+                                  {m.requiredLevel}%
+                                </strong>
                               </span>
                               {m.estimatedDuration && (
                                 <>
                                   <span>•</span>
                                   <span className="inline-flex items-center gap-1">
                                     <Clock className="w-3 h-3 text-[var(--text-muted)]" />
-                                    {m.estimatedDuration}
+                                    <span>{m.estimatedDuration}</span>
                                   </span>
                                 </>
                               )}
@@ -406,9 +527,8 @@ export default function RoadmapPage() {
                           </div>
                         </div>
 
-                        {/* Status Dropdown & Primary Action */}
+                        {/* Status Dropdown & Primary Learning Action */}
                         <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
-                          {/* Simple Status Selector */}
                           <select
                             aria-label={`Milestone #${m.order} status`}
                             value={m.status}
@@ -427,15 +547,22 @@ export default function RoadmapPage() {
                             <option value="completed">Completed</option>
                           </select>
 
-                          {/* Primary Button */}
+                          <Link
+                            to={`/quiz?skill=${encodeURIComponent(m.skillName)}`}
+                            className="inline-flex items-center gap-1 text-xs py-1 px-2.5 rounded-lg border border-[var(--border-color)] bg-[var(--surface-color)] text-[var(--text-main)] hover:bg-[var(--surface-elevated)] font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+                          >
+                            <HelpCircle className="w-3.5 h-3.5 text-[var(--primary-color)]" />
+                            <span>Practice Quiz</span>
+                          </Link>
+
                           <Button
                             variant={isCompleted ? 'secondary' : 'primary'}
                             size="sm"
-                            className="text-xs py-1 px-3"
-                            onClick={() => handlePrimaryAction(m)}
+                            className="text-xs py-1 px-3 font-semibold"
+                            onClick={() => handleMilestoneAction(m)}
                           >
                             {isCompleted
-                              ? 'Review'
+                              ? 'Review topics'
                               : isInProgress
                               ? 'Continue learning'
                               : 'Start learning'}
@@ -443,12 +570,17 @@ export default function RoadmapPage() {
                         </div>
                       </div>
 
-                      {/* Learning Objective */}
-                      <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                        {m.learningObjective}
-                      </p>
+                      {/* What you'll learn */}
+                      <div className="space-y-0.5 pt-0.5">
+                        <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
+                          What you'll learn
+                        </span>
+                        <p className="text-xs text-[var(--text-main)] leading-relaxed">
+                          {m.learningObjective}
+                        </p>
+                      </div>
 
-                      {/* Secondary "View topics & resources" toggle button */}
+                      {/* Collapsible Topics and Resources Control */}
                       <div className="pt-2 border-t border-[var(--border-color)]/60 flex items-center justify-between">
                         <button
                           type="button"
@@ -457,8 +589,8 @@ export default function RoadmapPage() {
                         >
                           <span>
                             {isExpanded
-                              ? 'Hide curriculum & resources'
-                              : `View topics (${completedTopicsCount}/${totalTopicsCount}) & resources (${milestoneResources.length})`}
+                              ? 'Hide topics & resources'
+                              : `Topics & resources (${completedTopicsCount}/${totalTopicsCount} topics • ${milestoneResources.length} resources)`}
                           </span>
                           {isExpanded ? (
                             <ChevronUp className="w-3.5 h-3.5" />
@@ -468,24 +600,29 @@ export default function RoadmapPage() {
                         </button>
 
                         <span className="text-[11px] text-[var(--text-muted)] font-mono">
-                          {totalTopicsCount > 0
-                            ? `${Math.round((completedTopicsCount / totalTopicsCount) * 100)}% topics studied`
-                            : ''}
+                          {totalTopicsCount > 0 ? `${topicPercentage}% topics completed` : ''}
                         </span>
                       </div>
 
-                      {/* Expanded Section: Topic checklist and resources */}
+                      {/* Expanded Curriculum Topics & Curated Resources */}
                       {isExpanded && (
                         <div className="pt-3 space-y-4 border-t border-[var(--border-color)]">
                           {/* Topic Checklist */}
                           {m.topics && m.topics.length > 0 && (
                             <div className="space-y-2">
-                              <p className="text-xs font-bold text-[var(--text-main)] uppercase tracking-wider">
-                                Checklist Topics
-                              </p>
+                              <div className="flex items-center justify-between">
+                                <p className="text-xs font-bold text-[var(--text-main)] uppercase tracking-wider">
+                                  Curriculum Topics
+                                </p>
+                                <span className="text-[11px] text-[var(--text-muted)]">
+                                  Click checkmark to record completion
+                                </span>
+                              </div>
+
                               <div className="space-y-1.5">
                                 {m.topics.map((topic, topicIdx) => {
                                   const isTopicUpdating = updatingOrder === `${m.order}-${topicIdx}`;
+                                  const isUpNext = !topic.completed && topicIdx === nextTopicIndex;
 
                                   return (
                                     <button
@@ -498,6 +635,8 @@ export default function RoadmapPage() {
                                       className={`w-full text-left p-2.5 rounded-lg border text-xs transition-colors flex items-start gap-2.5 ${
                                         topic.completed
                                           ? 'bg-slate-50 dark:bg-slate-800/40 border-[var(--border-color)] text-[var(--text-muted)]'
+                                          : isUpNext
+                                          ? 'bg-indigo-50/40 dark:bg-indigo-950/20 border-indigo-300 dark:border-indigo-700/60 text-[var(--text-main)]'
                                           : 'bg-white dark:bg-slate-800 border-[var(--border-color)] text-[var(--text-main)] hover:border-[var(--primary-color)]/40'
                                       }`}
                                     >
@@ -510,14 +649,28 @@ export default function RoadmapPage() {
                                           <Circle className="w-3.5 h-3.5 text-slate-400" />
                                         )}
                                       </div>
-                                      <div className="min-w-0 space-y-0.5">
-                                        <p
-                                          className={`font-semibold ${
-                                            topic.completed ? 'line-through text-[var(--text-muted)]' : ''
-                                          }`}
-                                        >
-                                          {topic.title}
-                                        </p>
+
+                                      <div className="min-w-0 flex-1 space-y-0.5">
+                                        <div className="flex items-center gap-2">
+                                          <p
+                                            className={`font-semibold ${
+                                              topic.completed
+                                                ? 'line-through text-[var(--text-muted)]'
+                                                : ''
+                                            }`}
+                                          >
+                                            {topic.title}
+                                          </p>
+                                          {isUpNext && (
+                                            <Badge
+                                              variant="indigo"
+                                              className="text-[9px] py-0 px-1.5 font-bold"
+                                            >
+                                              Up Next
+                                            </Badge>
+                                          )}
+                                        </div>
+
                                         <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
                                           {topic.description}
                                         </p>
@@ -530,10 +683,10 @@ export default function RoadmapPage() {
                           )}
 
                           {/* Curated Resources List */}
-                          <div className="space-y-2 pt-2">
+                          <div className="space-y-2 pt-1">
                             <p className="text-xs font-bold text-[var(--text-main)] uppercase tracking-wider flex items-center gap-1.5">
                               <BookOpen className="w-3.5 h-3.5 text-[var(--primary-color)]" />
-                              <span>Recommended Study Materials</span>
+                              <span>Recommended Learning Materials</span>
                             </p>
 
                             {milestoneResources.length === 0 ? (
@@ -549,7 +702,10 @@ export default function RoadmapPage() {
                                   >
                                     <div className="space-y-1">
                                       <div className="flex items-center justify-between text-[10px]">
-                                        <Badge variant="indigo" className="capitalize py-0 px-1.5 text-[9px]">
+                                        <Badge
+                                          variant="indigo"
+                                          className="capitalize py-0 px-1.5 text-[9px]"
+                                        >
                                           {res.level}
                                         </Badge>
                                         <span className="text-[var(--text-muted)] font-medium">
@@ -588,14 +744,14 @@ export default function RoadmapPage() {
                 })}
               </div>
 
-              {/* Navigation Back / Next Callout */}
+              {/* Bottom Navigation */}
               <div className="p-4 rounded-xl border border-[var(--border-color)] bg-[var(--surface-color)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs">
                 <span className="text-[var(--text-muted)]">
-                  Completed a milestone? Your progress saves automatically to Cloud Firestore.
+                  Progress is saved automatically to your profile in Cloud Firestore.
                 </span>
                 <div className="flex items-center gap-2 self-start sm:self-auto">
                   <Button to="/resources" variant="secondary" size="sm" className="text-xs">
-                    Browse All Resources
+                    Browse Resource Library
                   </Button>
                   <Button to="/dashboard" variant="secondary" size="sm" className="text-xs">
                     Return to Dashboard

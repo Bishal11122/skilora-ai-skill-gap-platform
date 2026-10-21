@@ -7,6 +7,8 @@ import assessmentRoutes from './assessment.routes.js';
 import skillGapRoutes from './skillGap.routes.js';
 import roadmapRoutes from './roadmap.routes.js';
 import resourceRoutes from './resource.routes.js';
+import quizRoutes from './quiz.routes.js';
+import dashboardRoutes from './dashboard.routes.js';
 
 const apiRouter = Router();
 
@@ -19,5 +21,7 @@ apiRouter.use('/assessment', assessmentRoutes);
 apiRouter.use('/skills', skillGapRoutes);
 apiRouter.use('/roadmap', roadmapRoutes);
 apiRouter.use('/resources', resourceRoutes);
+apiRouter.use('/quiz', quizRoutes);
+apiRouter.use('/dashboard', dashboardRoutes);
 
 export default apiRouter;

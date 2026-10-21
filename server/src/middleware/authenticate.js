@@ -1,13 +1,27 @@
 import { adminAuth, isAdminConfigured } from '../config/firebaseAdmin.js';
 
+let activeAdminAuth = undefined;
+
+export function getAdminAuth() {
+  if (activeAdminAuth !== undefined) {
+    return activeAdminAuth;
+  }
+  return adminAuth;
+}
+
+export function setAdminAuthForTesting(mockAuth) {
+  activeAdminAuth = mockAuth;
+}
+
 /**
  * Authentication middleware that verifies the Firebase ID token in the Authorization header.
  *
  * Extracts 'Bearer <idToken>', verifies cryptographically via Firebase Admin SDK,
- * and attaches verified { uid, email } to req.user.
+ * and attaches verified { uid, email, authTime } to req.user.
  */
 export async function authenticate(req, res, next) {
-  if (!isAdminConfigured || !adminAuth) {
+  const currentAuth = getAdminAuth();
+  if (!currentAuth && !isAdminConfigured) {
     return res.status(503).json({
       error: {
         message: 'Authentication service is not configured',
@@ -38,12 +52,13 @@ export async function authenticate(req, res, next) {
   const idToken = parts[1];
 
   try {
-    const decodedToken = await adminAuth.verifyIdToken(idToken);
+    const decodedToken = await currentAuth.verifyIdToken(idToken);
 
     // Attach ONLY cryptographically verified properties. Never trust client body/params.
     req.user = {
       uid: decodedToken.uid,
       email: decodedToken.email || null,
+      authTime: decodedToken.auth_time || null,
     };
 
     next();

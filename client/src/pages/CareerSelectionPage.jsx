@@ -131,17 +131,13 @@ export default function CareerSelectionPage() {
       <Container size="default">
         <div className="max-w-4xl mx-auto space-y-8">
           {/* Header */}
-          <div className="text-center space-y-3">
-            <div className="inline-flex items-center gap-2">
-              <Badge variant="plum">Phase 4 Milestone</Badge>
-              <Badge variant="neutral">Target Career Selection</Badge>
-            </div>
-            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-[var(--text-main)]">
+          <div className="text-center space-y-2">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-main)]">
               Choose Your Target Career Path
             </h1>
-            <p className="text-xs sm:text-sm text-[var(--text-muted)] max-w-xl mx-auto leading-relaxed">
-              Select the professional tech role you are aiming for. Your future skill assessments, gap
-              analysis, and personalized roadmap will be measured against this benchmark.
+            <p className="text-xs sm:text-sm text-[var(--text-muted)] max-w-lg mx-auto">
+              Select the professional tech role you are aiming for. Your skill assessments, gap
+              analysis, and personalized roadmap will be measured against this industry benchmark.
             </p>
           </div>
 
@@ -223,7 +219,7 @@ export default function CareerSelectionPage() {
           )}
 
           {/* Empty State */}
-          {!loading && careers.length === 0 && (
+          {!loading && !errorMessage && careers.length === 0 && (
             <Card className="p-8 sm:p-12 text-center space-y-4 border-dashed border-[var(--border-color)] bg-[var(--surface-color)]">
               <div className="w-12 h-12 rounded-2xl bg-[var(--primary-color)]/10 text-[var(--primary-color)] flex items-center justify-center mx-auto">
                 <Briefcase className="w-6 h-6" aria-hidden="true" />
@@ -269,10 +265,10 @@ export default function CareerSelectionPage() {
                         handleSelectCareer(career.id);
                       }
                     }}
-                    className={`relative text-left p-5 sm:p-6 rounded-2xl border-2 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] ${
+                    className={`relative text-left p-5 sm:p-6 rounded-xl border transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] ${
                       isSelected
-                        ? 'border-[var(--primary-color)] bg-[var(--primary-color)]/[0.04] shadow-md ring-1 ring-[var(--primary-color)]/20'
-                        : 'border-[var(--border-color)] bg-[var(--surface-color)] hover:border-[var(--border-color)] hover:bg-[var(--surface-elevated)]'
+                        ? 'border-[var(--primary-color)] bg-indigo-50/30 dark:bg-indigo-950/20 shadow-xs ring-1 ring-[var(--primary-color)]/30'
+                        : 'border-[var(--border-color)] bg-[var(--surface-color)] hover:border-slate-300 dark:hover:border-slate-700'
                     }`}
                   >
                     {/* Top Row: Category Badge & Radio Indicator */}

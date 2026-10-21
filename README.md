@@ -1,6 +1,7 @@
-# AI-Powered Skill Gap Analysis & Personalized Learning Platform
+# Skillora AI — AI-Powered Skill Gap Analysis & Personalized Learning Platform
 
-> **Tagline:** Resume → AI → Skills → Learning → Career  
+> **Brand:** Skillora AI  
+> **Tagline:** Smarter Skills. Brighter Futures.  
 > **Main Idea:** "Our system helps students know what to learn and how to learn it."
 
 A minor project submitted in partial fulfilment of the requirements for the degree of **Bachelor of Computer Applications (BCA) — AIML (5th Semester)**, JNCT Professional University, Bhopal.

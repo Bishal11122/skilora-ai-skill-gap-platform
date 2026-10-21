@@ -10,14 +10,32 @@ const app = express();
 // Security HTTP headers
 app.use(helmet());
 
-// CORS configuration: permit CLIENT_URL as well as default Vite dev ports
+// CORS configuration: permit CLIENT_URL as well as local dev ports
 const allowedOrigins = Array.from(
-  new Set([CLIENT_URL, 'http://localhost:5173', 'http://localhost:5174'].filter(Boolean))
+  new Set([
+    CLIENT_URL,
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:5175',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:5174',
+    'http://127.0.0.1:5175',
+  ].filter(Boolean))
 );
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g. mobile apps, curl, server-to-server)
+      if (!origin) return callback(null, true);
+      if (
+        allowedOrigins.includes(origin) ||
+        /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
+      ) {
+        return callback(null, true);
+      }
+      callback(new Error(`CORS blocked for origin ${origin}`));
+    },
     credentials: true,
   })
 );

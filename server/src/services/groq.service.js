@@ -276,7 +276,7 @@ ${sanitizedResumeText}
     );
   }
 
-  // De-duplicate skills by normalized name and map into canonical Skilora schema
+  // De-duplicate skills by normalized name and map into canonical Skillora AI schema
   const seenSkills = new Set();
   const standardizedSkills = [];
 
