@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Sun, Moon, Menu, X, LayoutDashboard, LogOut, Compass, Award } from 'lucide-react';
+import { Sun, Moon, Menu, X, LayoutDashboard, LogOut, Compass, Award, Milestone, BookOpen } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
 import Logo from './Logo';
@@ -74,35 +74,70 @@ export default function Navbar() {
 
             {user ? (
               /* Signed In State */
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <Link
-                  to="/career"
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] px-2.5 py-2 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+                  to="/dashboard"
+                  className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] ${
+                    location.pathname === '/dashboard'
+                      ? 'bg-[var(--primary-color)]/10 text-[var(--primary-color)] font-bold'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-elevated)]'
+                  }`}
                 >
-                  <Compass className="w-4 h-4 text-[var(--accent-color)]" aria-hidden="true" />
-                  <span>Careers</span>
+                  <LayoutDashboard className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span>Dashboard</span>
+                </Link>
+                <Link
+                  to="/roadmap"
+                  className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] ${
+                    location.pathname === '/roadmap'
+                      ? 'bg-[var(--primary-color)]/10 text-[var(--primary-color)] font-bold'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-elevated)]'
+                  }`}
+                >
+                  <Milestone className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span>Roadmap</span>
+                </Link>
+                <Link
+                  to="/resources"
+                  className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] ${
+                    location.pathname === '/resources'
+                      ? 'bg-[var(--primary-color)]/10 text-[var(--primary-color)] font-bold'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-elevated)]'
+                  }`}
+                >
+                  <BookOpen className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span>Resources</span>
                 </Link>
                 <Link
                   to="/assessment"
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] px-2.5 py-2 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+                  className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] ${
+                    location.pathname === '/assessment'
+                      ? 'bg-[var(--primary-color)]/10 text-[var(--primary-color)] font-bold'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-elevated)]'
+                  }`}
                 >
-                  <Award className="w-4 h-4 text-[var(--highlight-color)]" aria-hidden="true" />
-                  <span>Assessment</span>
+                  <Award className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span>Diagnostic</span>
                 </Link>
                 <Link
-                  to="/dashboard"
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--text-main)] hover:text-[var(--primary-color)] px-2.5 py-2 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+                  to="/career"
+                  className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] ${
+                    location.pathname === '/career'
+                      ? 'bg-[var(--primary-color)]/10 text-[var(--primary-color)] font-bold'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-elevated)]'
+                  }`}
                 >
-                  <LayoutDashboard className="w-4 h-4 text-[var(--primary-color)]" aria-hidden="true" />
-                  <span>Dashboard</span>
+                  <Compass className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span>Career</span>
                 </Link>
+                <div className="h-4 w-px bg-[var(--border-color)] mx-1" aria-hidden="true" />
                 <Button
                   variant="secondary"
                   size="sm"
                   onClick={logout}
-                  className="text-xs"
+                  className="text-xs py-1 px-2.5"
                 >
-                  <LogOut className="w-3.5 h-3.5 mr-1" aria-hidden="true" />
+                  <LogOut className="w-3 h-3 mr-1" aria-hidden="true" />
                   Sign Out
                 </Button>
               </div>
@@ -192,6 +227,22 @@ export default function Navbar() {
                 >
                   <Award className="w-4 h-4 text-[var(--highlight-color)]" />
                   <span>Diagnostic Assessment</span>
+                </Link>
+                <Link
+                  to="/roadmap"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-2.5 px-4 rounded-xl font-medium text-sm text-[var(--text-main)] bg-[var(--surface-elevated)] hover:bg-[var(--border-color)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] flex items-center justify-center gap-2"
+                >
+                  <Milestone className="w-4 h-4 text-[var(--primary-color)]" />
+                  <span>Personalized Roadmap</span>
+                </Link>
+                <Link
+                  to="/resources"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-2.5 px-4 rounded-xl font-medium text-sm text-[var(--text-main)] bg-[var(--surface-elevated)] hover:bg-[var(--border-color)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] flex items-center justify-center gap-2"
+                >
+                  <BookOpen className="w-4 h-4 text-[var(--accent-color)]" />
+                  <span>Curated Resources</span>
                 </Link>
                 <Link
                   to="/dashboard"

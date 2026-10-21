@@ -10,6 +10,8 @@ import DashboardPage from './pages/DashboardPage';
 import CareerSelectionPage from './pages/CareerSelectionPage';
 import ResumeUploadPage from './pages/ResumeUploadPage';
 import AssessmentPage from './pages/AssessmentPage';
+import RoadmapPage from './pages/RoadmapPage';
+import ResourcesPage from './pages/ResourcesPage';
 import SetupCheck from './pages/SetupCheck';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -82,6 +84,22 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <AssessmentPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/roadmap"
+                element={
+                  <ProtectedRoute>
+                    <RoadmapPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/resources"
+                element={
+                  <ProtectedRoute>
+                    <ResourcesPage />
                   </ProtectedRoute>
                 }
               />
