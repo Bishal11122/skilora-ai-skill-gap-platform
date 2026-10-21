@@ -65,7 +65,7 @@ export default function LoginPage() {
           <div className="text-center space-y-2">
             <Badge variant="plum">Account Sign In</Badge>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-main)]">
-              Welcome Back to Skilora
+              Welcome Back to Skillora AI
             </h1>
             <p className="text-xs sm:text-sm text-[var(--text-muted)]">
               Continue your structured career development roadmap.

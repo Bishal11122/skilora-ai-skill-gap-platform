@@ -2,7 +2,7 @@ import { motion, useScroll, useSpring, useReducedMotion } from 'motion/react';
 
 /**
  * Subtle top-edge scroll progress indicator using Motion for React.
- * Uses the Skilora Plum -> Coral -> Sage gradient.
+ * Uses the Skillora AI Plum -> Coral -> Sage gradient.
  * Automatically respects user's reduced motion preference.
  */
 export default function ScrollProgress() {

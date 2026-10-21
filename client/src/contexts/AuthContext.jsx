@@ -8,7 +8,7 @@ import {
   onAuthStateChanged,
 } from 'firebase/auth';
 import { auth, isFirebaseConfigured } from '../services/firebase';
-import { getAuth, postAuth, patchAuth } from '../services/api';
+import { getAuth, postAuth, patchAuth, deleteAuth } from '../services/api';
 
 export const AuthContext = createContext({
   user: null,
@@ -21,6 +21,7 @@ export const AuthContext = createContext({
   resetPassword: async () => {},
   updateDisplayName: async () => {},
   refreshProfile: async () => {},
+  deleteAccount: async () => {},
 });
 
 /**
@@ -249,6 +250,41 @@ export function AuthProvider({ children }) {
     return null;
   }, [user, syncProfile]);
 
+  /**
+   * Permanently deletes user account, cloud storage files, and all personal records.
+   */
+  const deleteAccount = async (confirmation = 'DELETE') => {
+    if (!auth?.currentUser) {
+      throw new Error('Not authenticated');
+    }
+
+    const { data, error: delErr, code } = await deleteAuth('/users/me', {
+      confirmation,
+    });
+
+    if (delErr) {
+      const err = new Error(delErr);
+      if (code) err.code = code;
+      throw err;
+    }
+
+    // Attempt client-side Firebase Auth user deletion as well
+    try {
+      if (auth.currentUser) {
+        await auth.currentUser.delete();
+      }
+    } catch (clientAuthErr) {
+      // If server already deleted the user from Firebase Auth via Admin SDK, this is expected
+      console.warn('[AuthContext] Client auth deletion notice:', clientAuthErr.message);
+    }
+
+    // Clean up local context state
+    setUser(null);
+    setProfile(null);
+
+    return data;
+  };
+
   const value = {
     user,
     profile,
@@ -260,6 +296,7 @@ export function AuthProvider({ children }) {
     resetPassword,
     updateDisplayName,
     refreshProfile,
+    deleteAccount,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

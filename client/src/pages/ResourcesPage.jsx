@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Search,
   ExternalLink,
@@ -7,6 +8,7 @@ import {
   Loader2,
   AlertCircle,
   Filter,
+  HelpCircle,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { getAuth } from '../services/api';
@@ -292,9 +294,18 @@ export default function ResourcesPage() {
                         </Badge>
                       </div>
 
-                      <span className="text-[11px] text-[var(--text-muted)]">
-                        {milestone.resources.length} {milestone.resources.length === 1 ? 'item' : 'items'}
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <Link
+                          to={`/quiz?skill=${encodeURIComponent(milestone.skillName)}`}
+                          className="inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--primary-color)] hover:underline"
+                        >
+                          <HelpCircle className="w-3.5 h-3.5" />
+                          <span>Practice Quiz</span>
+                        </Link>
+                        <span className="text-[11px] text-[var(--text-muted)]">
+                          {milestone.resources.length} {milestone.resources.length === 1 ? 'item' : 'items'}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Clean Resource Cards Grid */}

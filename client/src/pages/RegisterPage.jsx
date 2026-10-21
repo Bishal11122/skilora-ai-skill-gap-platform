@@ -72,7 +72,7 @@ export default function RegisterPage() {
           <div className="text-center space-y-2">
             <Badge variant="plum">Account Registration</Badge>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-main)]">
-              Create Your Skilora Account
+              Create Your Skillora AI Account
             </h1>
             <p className="text-xs sm:text-sm text-[var(--text-muted)]">
               Begin your structured skill gap analysis and personalized roadmap.

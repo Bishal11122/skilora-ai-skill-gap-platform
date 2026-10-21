@@ -752,7 +752,7 @@ export default function ResumeUploadPage() {
                     className="mt-0.5 h-4 w-4 rounded border-[var(--border-color)] text-[var(--primary-color)] focus:ring-[var(--focus-ring)] cursor-pointer"
                   />
                   <span className="text-xs text-[var(--text-main)] leading-relaxed font-medium">
-                    I agree that Skilora stores my resume file privately so it can be analyzed later.
+                    I agree that Skillora AI stores my resume file privately so it can be analyzed later.
                     I can delete it at any time.
                   </span>
                 </label>

@@ -72,6 +72,18 @@ export async function getRoadmap(req, res, next) {
       });
     }
 
+    // Check if roadmap for this career was previously saved in roadmapsByCareer
+    if (userData.roadmapsByCareer && userData.roadmapsByCareer[selectedCareerId]) {
+      const careerRoadmap = userData.roadmapsByCareer[selectedCareerId];
+      return res.status(200).json({
+        data: {
+          roadmap: careerRoadmap,
+          hasRoadmap: true,
+          canGenerate: false,
+        },
+      });
+    }
+
     // No roadmap yet, or career was changed
     return res.status(200).json({
       data: {
@@ -159,9 +171,10 @@ export async function generateRoadmap(req, res, next) {
       skillGaps: gapResult.skillGaps,
     });
 
-    // Save to Firestore under user document
+    // Save to Firestore under user document and persist by career
     const updates = {
       roadmap,
+      [`roadmapsByCareer.${selectedCareerId}`]: roadmap,
       roadmapGeneratedAt: FieldValue.serverTimestamp ? FieldValue.serverTimestamp() : new Date().toISOString(),
       updatedAt: FieldValue.serverTimestamp ? FieldValue.serverTimestamp() : new Date().toISOString(),
     };
@@ -261,6 +274,8 @@ export async function updateMilestoneStatus(req, res, next) {
         milestone.status = 'completed';
       } else if (someTopicsDone) {
         milestone.status = 'in-progress';
+      } else {
+        milestone.status = 'not-started';
       }
     }
 
@@ -293,10 +308,16 @@ export async function updateMilestoneStatus(req, res, next) {
       updatedAt: new Date().toISOString(),
     };
 
-    await userRef.update({
+    const careerKey = roadmap.careerId || userData.selectedCareerId;
+    const updates = {
       roadmap: updatedRoadmap,
       updatedAt: FieldValue.serverTimestamp ? FieldValue.serverTimestamp() : new Date().toISOString(),
-    });
+    };
+    if (careerKey) {
+      updates[`roadmapsByCareer.${careerKey}`] = updatedRoadmap;
+    }
+
+    await userRef.update(updates);
 
     return res.status(200).json({
       data: {

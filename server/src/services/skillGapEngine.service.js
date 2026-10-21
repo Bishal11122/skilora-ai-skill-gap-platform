@@ -78,6 +78,17 @@ const EVIDENCE_URGENCY = {
  */
 export function safeTimestamp(dateVal) {
   if (!dateVal) return 0;
+  if (typeof dateVal.toDate === 'function') {
+    const d = dateVal.toDate();
+    return d instanceof Date && Number.isFinite(d.getTime()) ? d.getTime() : 0;
+  }
+  if (typeof dateVal === 'object' && dateVal !== null) {
+    const sec = dateVal.seconds ?? dateVal._seconds;
+    if (typeof sec === 'number' && Number.isFinite(sec)) {
+      const nano = dateVal.nanoseconds ?? dateVal._nanoseconds ?? 0;
+      return sec * 1000 + Math.round(nano / 1e6);
+    }
+  }
   const time = new Date(dateVal).getTime();
   return Number.isFinite(time) ? time : 0;
 }
@@ -199,11 +210,13 @@ export function calculateSkillGaps({ benchmarkSkills = [], assessedSkills = [], 
     if (bestAssessment) {
       currentLevel = bestAssessment.level;
       effectiveLevel = bestAssessment.level;
-      evidenceSource = 'assessment-verified';
+      evidenceSource = bestAssessment.source || 'assessment-verified';
       hasEvidence = true;
       assessmentId = bestAssessment.assessmentId || undefined;
       assessedAt = bestAssessment.assessedAt || undefined;
-      explanation = `Verified through diagnostic assessment score of ${bestAssessment.level}/100.`;
+      explanation = evidenceSource === 'practice-checkpoint'
+        ? `Performance checkpoint from practice quiz score of ${bestAssessment.level}/100.`
+        : `Verified through diagnostic assessment score of ${bestAssessment.level}/100.`;
     } else {
       const resumeCandidates = extractedMap.get(canonicalKey) || [];
       const bestResume = resolveBestResumeRecord(resumeCandidates);

@@ -5,7 +5,7 @@ import Logo from './Logo';
 const CURRENT_YEAR = new Date().getFullYear();
 
 /**
- * Global Skilora Footer with academic credits and required disclaimer.
+ * Global Skillora AI Footer with academic credits and required disclaimer.
  */
 export default function Footer() {
   return (
@@ -16,10 +16,10 @@ export default function Footer() {
           <div className="md:col-span-2 space-y-3">
             <Logo />
             <p className="text-sm text-[var(--text-muted)] max-w-md leading-relaxed">
-              Skilora helps students, graduates, and career changers understand their current technical skills, identify gaps against industry requirements, and follow a structured roadmap.
+              Skillora AI helps students, graduates, and career changers understand their current technical skills, identify gaps against industry requirements, and follow a structured roadmap.
             </p>
-            <p className="text-xs font-medium text-[var(--accent-color)]">
-              Your skills. Your next move.
+            <p className="text-xs font-semibold text-[var(--accent-color)] tracking-wide">
+              Smarter Skills. Brighter Futures.
             </p>
             <div className="pt-2 text-xs text-[var(--text-muted)] space-y-1">
               <p>
@@ -94,7 +94,7 @@ export default function Footer() {
             &ldquo;AI-generated analysis is guidance for learning. It does not guarantee jobs or employability.&rdquo;
           </p>
           <p className="text-center sm:text-right">
-            &copy; {CURRENT_YEAR} Skilora. All rights reserved.
+            &copy; {CURRENT_YEAR} Skillora AI. All rights reserved.
           </p>
         </div>
       </Container>

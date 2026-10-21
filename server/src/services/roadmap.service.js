@@ -417,7 +417,7 @@ export async function generateRoadmapWithGroq({ careerId, careerName, skillGaps 
     )
     .join('\n');
 
-  const systemPrompt = `You are an expert technical curriculum designer for the educational platform Skilora.
+  const systemPrompt = `You are an expert technical curriculum designer for the educational platform Skillora AI.
 Your task is to generate a personalized learning roadmap for a student aiming to become a: "${careerName}".
 
 The student has 5 benchmark skills, ordered from highest priority gap (#1) to lowest (#5).

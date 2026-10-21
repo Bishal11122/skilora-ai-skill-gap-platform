@@ -40,7 +40,7 @@ export default function CtaSection() {
           </h2>
 
           <p className="relative text-base sm:text-lg text-[var(--text-muted)] max-w-xl mx-auto leading-relaxed">
-            Join Skilora to transform your declared competencies into a concrete, benchmarked career path.
+            Join Skillora AI to transform your declared competencies into a concrete, benchmarked career path.
             Know exactly what to learn and take your next move with confidence.
           </p>
 

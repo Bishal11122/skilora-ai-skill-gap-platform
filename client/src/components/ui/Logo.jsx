@@ -1,87 +1,90 @@
 import { Link } from 'react-router-dom';
 
 /**
- * Pure geometric Skilora Symbol SVG.
- * Concept: An abstract letter 'S' combining 3 ascending skill milestones
- * (Foundation [Sage], Diagnostic Pivot [Plum], Target Career Milestone [Coral])
- * connected by progressive geometric paths with an upward trajectory chevron.
+ * Pure geometric Skillora AI Symbol SVG.
+ * Concept: Ascending 3-tier skill nodes (Foundation, Diagnostic Pivot, Target Career)
+ * connected by an upward learning trajectory curve with a subtle forward vector.
+ * Compact, crisp, and perfectly balanced at 24-32px in light and dark themes.
  */
-export function SkiloraSymbol({ size = 32, className = '' }) {
+export function SkilloraSymbol({ size = 28, className = '' }) {
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 36 36"
+      viewBox="0 0 28 28"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={`shrink-0 ${className}`}
       aria-hidden="true"
     >
       <defs>
-        {/* Subtle radial ambient glow inside the symbol squircle */}
-        <radialGradient
-          id="skilora-symbol-glow"
-          cx="0.5"
-          cy="0.5"
-          r="0.5"
-          fx="0.8"
-          fy="0.2"
+        <linearGradient
+          id="skillora-mark-bg"
+          x1="0"
+          y1="0"
+          x2="28"
+          y2="28"
+          gradientUnits="userSpaceOnUse"
         >
-          <stop offset="0%" stopColor="var(--highlight-color)" stopOpacity="0.18" />
-          <stop offset="50%" stopColor="var(--primary-color)" stopOpacity="0.12" />
-          <stop offset="100%" stopColor="var(--accent-color)" stopOpacity="0.05" />
-        </radialGradient>
+          <stop offset="0%" stopColor="var(--primary-color)" stopOpacity="0.16" />
+          <stop offset="100%" stopColor="var(--accent-color)" stopOpacity="0.08" />
+        </linearGradient>
+
+        <linearGradient
+          id="skillora-mark-stroke"
+          x1="6"
+          y1="22"
+          x2="22"
+          y2="6"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0%" stopColor="var(--accent-color)" />
+          <stop offset="50%" stopColor="var(--primary-color)" />
+          <stop offset="100%" stopColor="var(--highlight-color)" />
+        </linearGradient>
       </defs>
 
-      {/* Rounded Squircle Container */}
+      {/* Rounded squircle emblem badge */}
       <rect
-        x="1.5"
-        y="1.5"
-        width="33"
-        height="33"
-        rx="9.5"
-        fill="url(#skilora-symbol-glow)"
+        x="1"
+        y="1"
+        width="26"
+        height="26"
+        rx="7"
+        fill="url(#skillora-mark-bg)"
         stroke="var(--border-color)"
         strokeWidth="1"
       />
 
-      {/* Lower Foundation & Learning Arc (Sage) */}
+      {/* Ascending learning trajectory curve */}
       <path
-        d="M 10 26 C 7.5 26, 7.5 22, 10.5 20 C 13.5 18, 15.5 17.5, 18 16"
-        stroke="var(--accent-color)"
-        strokeWidth="2.5"
+        d="M 7.5 19.5 C 9.5 19.5 11 17 14 14 C 17 11 18.5 8.5 20.5 8.5"
+        stroke="url(#skillora-mark-stroke)"
+        strokeWidth="2.2"
         strokeLinecap="round"
       />
 
-      {/* Upper Advancement & Career Crest Arc (Plum) */}
-      <path
-        d="M 18 16 C 20.5 14.5, 23 13.5, 25.5 11.5 C 28 9.5, 27 6.5, 24 6.5 C 20 6.5, 16 8.5, 13.5 11"
-        stroke="var(--primary-color)"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      />
+      {/* Tier 1 Node: Acquired Foundation (Accent / Sky) */}
+      <circle cx="7.5" cy="19.5" r="2" fill="var(--accent-color)" />
 
-      {/* Level 1 Node: Foundation & Acquired Skills (Sage Green) */}
-      <circle cx="10" cy="25.5" r="2.5" fill="var(--accent-color)" />
-
-      {/* Level 2 Node: Gap Assessment & Diagnostic Pivot (Rich Plum / Soft Lavender) */}
+      {/* Tier 2 Node: AI Diagnostic Pivot (Primary Indigo) */}
       <circle
-        cx="18"
-        cy="16"
-        r="2.75"
+        cx="14"
+        cy="14"
+        r="2.2"
         fill="var(--primary-color)"
         stroke="var(--surface-color)"
-        strokeWidth="1.5"
+        strokeWidth="1.2"
       />
 
-      {/* Level 3 Node: Target Career Benchmark / Next Move (Warm Coral) */}
-      <circle cx="25.5" cy="7.5" r="2.5" fill="var(--highlight-color)" />
+      {/* Tier 3 Node: Career Benchmark (Highlight / Coral-Indigo) */}
+      <circle cx="20.5" cy="8.5" r="2" fill="var(--highlight-color)" />
 
-      {/* Upward Progression Chevrons / Trajectory Accent */}
+      {/* Subtle upward trajectory tick */}
       <path
-        d="M 23 9.5 L 26 6.5 L 26.5 9.5"
+        d="M 18.5 7 L 21.5 7 L 21.5 10"
         stroke="var(--highlight-color)"
-        strokeWidth="1.6"
+        strokeWidth="1.4"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -90,25 +93,28 @@ export function SkiloraSymbol({ size = 32, className = '' }) {
 }
 
 /**
- * Scalable Skilora brand mark with distinct geometric symbol and refined wordmark.
+ * Scalable Skillora AI brand mark with compact geometric symbol and refined wordmark.
  */
-export default function Logo({ className = '', link = true, size = 34 }) {
+export default function Logo({ className = '', link = true, size = 28 }) {
   const content = (
-    <div className={`inline-flex items-center gap-2.5 font-bold tracking-tight text-[var(--text-main)] ${className}`}>
-      <SkiloraSymbol size={size} />
-      <span className="text-xl font-bold tracking-tight flex items-center">
-        <span className="text-[var(--text-main)]">Skil</span>
+    <span className={`inline-flex items-center gap-2 select-none ${className}`}>
+      <SkilloraSymbol size={size} />
+      <span className="text-lg font-bold tracking-tight flex items-center leading-none">
+        <span className="text-[var(--text-main)]">Skill</span>
         <span className="text-[var(--primary-color)]">ora</span>
+        <span className="ml-1.5 px-1.5 py-0.5 text-[9px] font-bold tracking-wider uppercase rounded bg-[var(--primary-color)]/10 text-[var(--primary-color)] border border-[var(--primary-color)]/20 leading-none">
+          AI
+        </span>
       </span>
-    </div>
+    </span>
   );
 
   if (link) {
     return (
       <Link
         to="/"
-        className="focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] rounded-xl transition-opacity hover:opacity-90 inline-flex items-center"
-        aria-label="Skilora Home"
+        className="focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] rounded-lg transition-opacity hover:opacity-90 inline-flex items-center"
+        aria-label="Skillora AI Home"
       >
         {content}
       </Link>
@@ -117,3 +123,7 @@ export default function Logo({ className = '', link = true, size = 34 }) {
 
   return content;
 }
+
+// Export SkiloraSymbol alias for backwards compatibility with any existing imports
+export const SkiloraSymbol = SkilloraSymbol;
+

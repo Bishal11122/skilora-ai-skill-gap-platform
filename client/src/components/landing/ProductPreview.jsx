@@ -79,7 +79,7 @@ export default function ProductPreview() {
             <div className="w-3 h-3 rounded-full bg-[var(--highlight-color)]" />
             <div className="w-3 h-3 rounded-full bg-[var(--accent-color)]" />
             <div className="w-3 h-3 rounded-full bg-[var(--primary-color)]" />
-            <span className="text-xs font-mono text-[var(--text-muted)] ml-2">skilora.app/preview</span>
+            <span className="text-xs font-mono text-[var(--text-muted)] ml-2">skillora.ai/preview</span>
           </div>
           <Badge variant="plum">SAMPLE DATA</Badge>
         </div>

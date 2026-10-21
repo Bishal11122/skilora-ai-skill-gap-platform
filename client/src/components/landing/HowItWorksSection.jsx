@@ -134,7 +134,7 @@ export default function HowItWorksSection() {
       <Container>
         <SectionHeading
           badge="Product Journey"
-          title="How Skilora Turns Skills Into Your Next Move"
+          title="How Skillora AI Turns Skills Into Your Next Move"
           subtitle="A clear 9-step progression designed to take you from initial skill discovery to interview-ready technical capability."
         />
 
@@ -244,7 +244,7 @@ export default function HowItWorksSection() {
                 Built For Serious Students, Aspiring Engineers & Career Changers
               </h3>
               <p className="text-sm sm:text-base text-[var(--text-muted)] leading-relaxed">
-                Rather than generic certificates or superficial quizzes, Skilora focuses on objective diagnostic
+                Rather than generic certificates or superficial quizzes, Skillora AI focuses on objective diagnostic
                 validation. Compare your real skills against active industry benchmarks and study with curated
                 learning roadmaps that make every study session count.
               </p>

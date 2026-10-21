@@ -8,7 +8,7 @@ export const DIFFICULTY_LEVELS = ['beginner', 'intermediate', 'advanced'];
 
 /**
  * Comprehensive Catalog of Vetted, 100% Free Learning Resources.
- * Mapped to canonical skills across all 5 Skilora career benchmark tracks.
+ * Mapped to canonical skills across all 5 Skillora AI career benchmark tracks.
  */
 export const LEARNING_RESOURCES = [
   // ==========================================

@@ -89,13 +89,28 @@ async function authenticatedRequest(endpoint, method = 'GET', body = null, extra
     const response = await fetch(url, options);
 
     if (response.status === 401) {
-      // Clean sign-out on 401 Unauthorized response from server
+      // Check if server rejected specifically for RECENT_AUTH_REQUIRED
+      try {
+        const errorBody = await response.json();
+        if (errorBody?.error?.code === 'RECENT_AUTH_REQUIRED') {
+          return {
+            data: null,
+            error: errorBody.error.message,
+            code: 'RECENT_AUTH_REQUIRED',
+            status: 401,
+          };
+        }
+      } catch {
+        // Fallback to normal session sign-out
+      }
+
+      // Clean sign-out on general 401 Unauthorized response from server
       try {
         await auth.signOut();
       } catch {
         // Ignore sign-out errors
       }
-      return { data: null, error: 'Session expired. Please log in again.' };
+      return { data: null, error: 'Session expired. Please log in again.', status: 401 };
     }
 
     if (!response.ok) {
@@ -141,8 +156,8 @@ export function patchAuth(endpoint, body) {
   return authenticatedRequest(endpoint, 'PATCH', body);
 }
 
-export function deleteAuth(endpoint) {
-  return authenticatedRequest(endpoint, 'DELETE');
+export function deleteAuth(endpoint, body = null) {
+  return authenticatedRequest(endpoint, 'DELETE', body);
 }
 
 export function uploadAuth(endpoint, formData, { method = 'POST', signal } = {}) {

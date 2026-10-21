@@ -12,6 +12,8 @@ import ResumeUploadPage from './pages/ResumeUploadPage';
 import AssessmentPage from './pages/AssessmentPage';
 import RoadmapPage from './pages/RoadmapPage';
 import ResourcesPage from './pages/ResourcesPage';
+import QuizPage from './pages/QuizPage';
+import SettingsPage from './pages/SettingsPage';
 import SetupCheck from './pages/SetupCheck';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -100,6 +102,30 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <ResourcesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/quiz"
+                element={
+                  <ProtectedRoute>
+                    <QuizPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/quiz/:skillName"
+                element={
+                  <ProtectedRoute>
+                    <QuizPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <SettingsPage />
                   </ProtectedRoute>
                 }
               />
