@@ -9,6 +9,8 @@ import {
   Check,
   AlertTriangle,
   Briefcase,
+  Target,
+  Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { getAuth, putAuth } from '../services/api';
@@ -113,41 +115,45 @@ export default function CareerSelectionPage() {
     }
 
     setSavedId(selectedId);
-    setSuccessMessage('Target career goal saved successfully.');
+    setSuccessMessage('Target career benchmark aligned successfully.');
     await refreshProfile();
     setSaving(false);
 
     // Continue to resume upload
     setTimeout(() => {
       navigate('/resume');
-    }, 600);
+    }, 500);
   };
 
   const pendingCareer = careers.find((c) => c.id === pendingId);
   const currentSavedCareer = careers.find((c) => c.id === savedId);
 
   return (
-    <div className="py-12 sm:py-16 min-h-[75vh]">
+    <div className="py-10 sm:py-14 min-h-[80vh]">
       <Container size="default">
         <div className="max-w-4xl mx-auto space-y-8">
           {/* Header */}
           <div className="text-center space-y-2">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-main)]">
-              Choose Your Target Career Path
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold text-[var(--primary-color)] bg-[var(--primary-color)]/10 border border-[var(--primary-color)]/20 mb-1">
+              <Target className="w-3.5 h-3.5" />
+              <span>Step 1 of 5: Baseline Selection</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-main)]">
+              Select Your Target Career Track
             </h1>
-            <p className="text-xs sm:text-sm text-[var(--text-muted)] max-w-lg mx-auto">
-              Select the professional tech role you are aiming for. Your skill assessments, gap
-              analysis, and personalized roadmap will be measured against this industry benchmark.
+            <p className="text-xs sm:text-sm text-[var(--text-muted)] max-w-xl mx-auto leading-relaxed">
+              Choose the verified role you are targeting. Your diagnostic assessments, skill gap matrix,
+              and milestone roadmap will be calculated against this canonical standard.
             </p>
           </div>
 
-          {/* Accessible Live Regions */}
+          {/* Accessible Live Feedback */}
           {errorMessage && (
             <div
               role="alert"
-              className="p-4 rounded-xl bg-[var(--danger-color)]/10 border border-[var(--danger-color)]/25 text-[var(--danger-color)] text-xs sm:text-sm font-medium flex items-center gap-2.5"
+              className="p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 text-xs sm:text-sm font-medium flex items-center gap-2.5"
             >
-              <AlertCircle className="w-5 h-5 shrink-0" aria-hidden="true" />
+              <AlertCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
               <span>{errorMessage}</span>
             </div>
           )}
@@ -156,53 +162,52 @@ export default function CareerSelectionPage() {
             <div
               role="status"
               aria-live="polite"
-              className="p-4 rounded-xl bg-[var(--success-color)]/10 border border-[var(--success-color)]/25 text-[var(--success-color)] text-xs sm:text-sm font-semibold flex items-center gap-2.5"
+              className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 text-xs sm:text-sm font-semibold flex items-center gap-2.5"
             >
-              <CheckCircle2 className="w-5 h-5 shrink-0" aria-hidden="true" />
+              <CheckCircle2 className="w-4 h-4 shrink-0" aria-hidden="true" />
               <span>{successMessage}</span>
             </div>
           )}
 
-          {/* Confirmation Modal / Card for Changing Career */}
+          {/* Confirmation Dialog for Changing Career */}
           {pendingId && (
             <div
               role="dialog"
               aria-modal="true"
               aria-labelledby="confirm-switch-title"
-              className="p-5 sm:p-6 rounded-2xl bg-[var(--surface-color)] border-2 border-[var(--highlight-color)]/50 shadow-xl space-y-4 animate-in fade-in"
+              className="p-5 sm:p-6 rounded-xl bg-[var(--surface-color)] border border-amber-300 dark:border-amber-700/60 shadow-lg space-y-4"
             >
               <div className="flex items-start gap-3.5">
-                <div className="p-2.5 rounded-xl bg-[var(--highlight-color)]/15 text-[var(--highlight-color)] shrink-0">
+                <div className="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 shrink-0">
                   <AlertTriangle className="w-5 h-5" aria-hidden="true" />
                 </div>
                 <div className="space-y-1">
                   <h3
                     id="confirm-switch-title"
-                    className="text-base font-bold text-[var(--text-main)]"
+                    className="text-sm font-bold text-[var(--text-main)]"
                   >
-                    Change Target Career Goal?
+                    Switch Target Career Track?
                   </h3>
-                  <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed">
+                  <p className="text-xs text-[var(--text-muted)] leading-relaxed">
                     You currently have{' '}
                     <strong className="text-[var(--text-main)]">
                       {currentSavedCareer?.name || savedId}
                     </strong>{' '}
-                    selected. Changing your target career to{' '}
+                    active. Changing your target career to{' '}
                     <strong className="text-[var(--text-main)]">
                       {pendingCareer?.name || pendingId}
                     </strong>{' '}
-                    will realign your future skill gap diagnostics, roadmap milestones, and resume
-                    evaluations.
+                    will realign your upcoming skill gap diagnostics, roadmap milestones, and practice quizzes.
                   </p>
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center justify-end gap-3 pt-2 border-t border-[var(--border-color)]">
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[var(--border-color)]">
                 <Button variant="ghost" size="sm" onClick={cancelCareerSwitch}>
                   Cancel
                 </Button>
                 <Button variant="primary" size="sm" onClick={confirmCareerSwitch}>
-                  Confirm Change
+                  Confirm Switch
                 </Button>
               </div>
             </div>
@@ -211,8 +216,8 @@ export default function CareerSelectionPage() {
           {/* Loading State */}
           {loading && (
             <div className="py-20 flex flex-col items-center justify-center space-y-3">
-              <Loader2 className="w-8 h-8 animate-spin text-[var(--primary-color)]" aria-hidden="true" />
-              <p className="text-sm font-medium text-[var(--text-muted)]">
+              <Loader2 className="w-7 h-7 animate-spin text-[var(--primary-color)]" aria-hidden="true" />
+              <p className="text-xs font-medium text-[var(--text-muted)]">
                 Loading standardized career benchmarks...
               </p>
             </div>
@@ -221,22 +226,16 @@ export default function CareerSelectionPage() {
           {/* Empty State */}
           {!loading && !errorMessage && careers.length === 0 && (
             <Card className="p-8 sm:p-12 text-center space-y-4 border-dashed border-[var(--border-color)] bg-[var(--surface-color)]">
-              <div className="w-12 h-12 rounded-2xl bg-[var(--primary-color)]/10 text-[var(--primary-color)] flex items-center justify-center mx-auto">
-                <Briefcase className="w-6 h-6" aria-hidden="true" />
+              <div className="w-10 h-10 rounded-xl bg-[var(--primary-color)]/10 text-[var(--primary-color)] flex items-center justify-center mx-auto">
+                <Briefcase className="w-5 h-5" aria-hidden="true" />
               </div>
               <div className="space-y-1.5 max-w-md mx-auto">
                 <h3 className="text-base font-bold text-[var(--text-main)]">
                   No Career Benchmarks Found
                 </h3>
-                <p className="text-xs sm:text-sm text-[var(--text-muted)]">
+                <p className="text-xs text-[var(--text-muted)]">
                   The Firestore <code className="px-1 py-0.5 rounded bg-[var(--surface-elevated)] text-[var(--text-main)] font-mono text-xs">careers</code> collection is currently empty.
                 </p>
-                <p className="text-xs text-[var(--text-muted)] pt-2">
-                  Please run the idempotent seed script on the backend:
-                </p>
-                <pre className="p-2.5 rounded-lg bg-[var(--surface-elevated)] border border-[var(--border-color)] text-xs font-mono text-left overflow-x-auto text-[var(--text-main)]">
-                  node server/scripts/seedCareers.js
-                </pre>
               </div>
             </Card>
           )}
@@ -246,7 +245,7 @@ export default function CareerSelectionPage() {
             <div
               role="radiogroup"
               aria-label="Target Career Options"
-              className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5"
+              className="grid grid-cols-1 md:grid-cols-2 gap-4"
             >
               {careers.map((career) => {
                 const isSelected = selectedId === career.id;
@@ -265,19 +264,21 @@ export default function CareerSelectionPage() {
                         handleSelectCareer(career.id);
                       }
                     }}
-                    className={`relative text-left p-5 sm:p-6 rounded-xl border transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] ${
+                    className={`relative text-left p-6 rounded-2xl border transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] hover:-translate-y-1 hover:shadow-md ${
                       isSelected
-                        ? 'border-[var(--primary-color)] bg-indigo-50/30 dark:bg-indigo-950/20 shadow-xs ring-1 ring-[var(--primary-color)]/30'
-                        : 'border-[var(--border-color)] bg-[var(--surface-color)] hover:border-slate-300 dark:hover:border-slate-700'
+                        ? 'border-[var(--primary-color)] bg-[var(--pastel-lavender)]/40 shadow-sm ring-2 ring-[var(--focus-ring)]/20'
+                        : 'border-[var(--border-color)] bg-[var(--surface-color)] hover:border-[var(--text-muted)]/40 shadow-xs'
                     }`}
                   >
                     {/* Top Row: Category Badge & Radio Indicator */}
                     <div className="flex items-center justify-between gap-3 mb-3">
                       <div className="flex items-center gap-2">
-                        <Badge variant="plum">{career.category || 'Engineering'}</Badge>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider bg-[var(--surface-elevated)] border border-[var(--border-color)] text-[var(--text-muted)] font-mono">
+                          {career.category || 'Engineering'}
+                        </span>
                         {isCurrentSaved && (
-                          <span className="text-[11px] font-semibold text-[var(--accent-color)] uppercase tracking-wider">
-                            Active Choice
+                          <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                            Active Goal
                           </span>
                         )}
                       </div>
@@ -295,11 +296,11 @@ export default function CareerSelectionPage() {
                     </div>
 
                     {/* Career Title & Description */}
-                    <div className="space-y-1.5 mb-4">
-                      <h2 className="text-lg font-bold text-[var(--text-main)] tracking-tight">
+                    <div className="space-y-1.5 mb-3.5">
+                      <h2 className="text-base font-bold text-[var(--text-main)] tracking-tight">
                         {career.name}
                       </h2>
-                      <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed">
+                      <p className="text-xs text-[var(--text-muted)] leading-relaxed line-clamp-2">
                         {career.description}
                       </p>
                     </div>
@@ -307,14 +308,14 @@ export default function CareerSelectionPage() {
                     {/* Key Skills Tags */}
                     {career.skills && career.skills.length > 0 && (
                       <div className="space-y-1.5 pt-3 border-t border-[var(--border-color)]">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] block">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] block font-mono">
                           Benchmark Skills
                         </span>
                         <div className="flex flex-wrap gap-1.5">
                           {career.skills.map((skill) => (
                             <span
                               key={skill}
-                              className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-[var(--surface-elevated)] border border-[var(--border-color)] text-[var(--text-main)]"
+                              className="px-2 py-0.5 rounded text-[11px] font-medium bg-[var(--surface-elevated)] border border-[var(--border-color)] text-[var(--text-main)]"
                             >
                               {skill}
                             </span>
@@ -331,7 +332,7 @@ export default function CareerSelectionPage() {
           {/* Action Footer */}
           {!loading && careers.length > 0 && (
             <div className="pt-6 border-t border-[var(--border-color)] flex flex-col sm:flex-row items-center justify-between gap-4">
-              <Button to="/dashboard" variant="ghost" size="md">
+              <Button to="/dashboard" variant="ghost" size="sm">
                 <ArrowLeft className="w-4 h-4 mr-1.5" aria-hidden="true" />
                 Back to Dashboard
               </Button>
@@ -339,7 +340,7 @@ export default function CareerSelectionPage() {
               <div className="flex items-center gap-3 w-full sm:w-auto">
                 <Button
                   variant="primary"
-                  size="lg"
+                  size="md"
                   disabled={!selectedId || saving}
                   onClick={handleSaveAndContinue}
                   className="w-full sm:w-auto justify-center"
@@ -351,7 +352,7 @@ export default function CareerSelectionPage() {
                     </>
                   ) : (
                     <>
-                      Save & Continue to Resume
+                      Save &amp; Continue to Resume
                       <ArrowRight className="w-4 h-4 ml-2" aria-hidden="true" />
                     </>
                   )}

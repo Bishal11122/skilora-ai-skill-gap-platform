@@ -258,7 +258,10 @@ export default function AssessmentPage() {
   }
 
   return (
-    <div className="py-10 sm:py-14 min-h-[75vh]">
+    <div className="relative py-10 sm:py-14 min-h-[75vh] overflow-hidden">
+      {/* Soft Pastel Ambient Aura */}
+      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-r from-emerald-100/35 via-violet-100/30 to-sky-100/35 dark:from-emerald-950/20 dark:via-purple-950/20 dark:to-sky-950/20 rounded-full blur-3xl pointer-events-none -z-10" />
+
       <Container size="default">
         {/* =========================================================================
             STATE 1: OVERVIEW SCREEN
@@ -266,7 +269,7 @@ export default function AssessmentPage() {
         {viewState === 'overview' && (
           <div className="max-w-2xl mx-auto space-y-6">
             <div className="space-y-2 text-center">
-              <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-main)] tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-main)] tracking-tight font-heading">
                 Verify Your Technical Skills
               </h1>
               <p className="text-xs sm:text-sm text-[var(--text-muted)] max-w-lg mx-auto leading-relaxed">
@@ -286,7 +289,7 @@ export default function AssessmentPage() {
             )}
 
             {/* Assessment Rules Card */}
-            <Card className="p-6 sm:p-7 border-[var(--border-color)] bg-[var(--surface-color)] shadow-md space-y-6">
+            <Card variant="glass" className="p-6 sm:p-7 shadow-lg space-y-6 rounded-2xl">
               <div className="flex items-center justify-between pb-3 border-b border-[var(--border-color)]">
                 <div className="flex items-center gap-2">
                   <Compass className="w-4 h-4 text-[var(--primary-color)]" aria-hidden="true" />
@@ -294,7 +297,7 @@ export default function AssessmentPage() {
                     Target Role: {careerName}
                   </span>
                 </div>
-                <Badge variant="sage">15 Questions</Badge>
+                <Badge variant="mint">15 Questions</Badge>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -356,7 +359,8 @@ export default function AssessmentPage() {
                 <Button
                   variant="primary"
                   size="lg"
-                  className="w-full justify-center text-sm font-bold shadow-md"
+                  pill
+                  className="w-full justify-center text-sm font-bold shadow-md shadow-primary-500/20"
                   onClick={handleStartAssessment}
                   disabled={isStarting}
                 >
@@ -661,9 +665,9 @@ export default function AssessmentPage() {
               </div>
 
               {/* Progress bar */}
-              <div className="w-full bg-[var(--border-color)] h-2 rounded-full overflow-hidden max-w-md mx-auto">
+              <div className="w-full bg-[var(--surface-elevated)] h-2 rounded-full overflow-hidden max-w-md mx-auto">
                 <div
-                  className="h-full rounded-full transition-all duration-500 bg-gradient-to-r from-[var(--primary-color)] to-[var(--accent-color)]"
+                  className="h-full rounded-full transition-all duration-500 bg-[var(--primary-color)]"
                   style={{ width: `${Math.min(100, Math.max(5, resultData.overallScore))}%` }}
                 />
               </div>

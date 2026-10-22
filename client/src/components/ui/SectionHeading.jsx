@@ -5,7 +5,7 @@ import Badge from './Badge';
  */
 export default function SectionHeading({
   badge,
-  badgeVariant = 'plum',
+  badgeVariant = 'neutral',
   title,
   subtitle,
   align = 'center',

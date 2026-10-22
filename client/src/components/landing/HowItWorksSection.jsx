@@ -25,7 +25,7 @@ export default function HowItWorksSection() {
     {
       stageNumber: 'STAGE 1',
       stageName: 'Profile & Career Goal',
-      theme: 'plum',
+      badgeClass: 'bg-[var(--pastel-lavender)] text-[var(--pastel-lavender-text)] border-[var(--pastel-lavender-border)]',
       steps: [
         {
           num: '01',
@@ -53,8 +53,8 @@ export default function HowItWorksSection() {
     {
       stageNumber: 'STAGE 2',
       stageName: 'AI Gap Diagnostics',
-      theme: 'coral',
       isHighlighted: true,
+      badgeClass: 'bg-[var(--pastel-peach)] text-[var(--pastel-peach-text)] border-[var(--pastel-peach-border)]',
       steps: [
         {
           num: '04',
@@ -83,7 +83,7 @@ export default function HowItWorksSection() {
     {
       stageNumber: 'STAGE 3',
       stageName: 'Targeted Learning & Mastery',
-      theme: 'sage',
+      badgeClass: 'bg-[var(--pastel-mint)] text-[var(--pastel-mint-text)] border-[var(--pastel-mint-border)]',
       steps: [
         {
           num: '07',
@@ -130,7 +130,7 @@ export default function HowItWorksSection() {
   };
 
   return (
-    <section id="how-it-works" className="py-20 sm:py-24 bg-[var(--surface-color)] border-y border-[var(--border-color)]">
+    <section id="how-it-works" className="py-20 sm:py-24 bg-[var(--surface-elevated)]/50 border-y border-[var(--border-color)] transition-colors">
       <Container>
         <SectionHeading
           badge="Product Journey"
@@ -155,15 +155,11 @@ export default function HowItWorksSection() {
                 {/* Stage Header Line with Badge */}
                 <div className="flex items-center gap-3">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${
-                      isHighlight
-                        ? 'bg-[var(--highlight-color)]/12 text-[var(--highlight-color)] border-[var(--highlight-color)]/30'
-                        : 'bg-[var(--surface-elevated)] text-[var(--text-muted)] border-[var(--border-color)]'
-                    }`}
+                    className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border shadow-xs ${stage.badgeClass}`}
                   >
                     {stage.stageNumber}
                   </span>
-                  <h3 className="text-base sm:text-lg font-bold text-[var(--text-main)]">
+                  <h3 className="text-base sm:text-lg font-bold text-[var(--text-main)] font-heading">
                     {stage.stageName}
                   </h3>
                   <div className="flex-1 h-px bg-[var(--border-color)]" aria-hidden="true" />
@@ -179,16 +175,16 @@ export default function HowItWorksSection() {
                       <motion.div key={step.num} variants={itemVariants}>
                         <Card
                           hover
-                          className={`h-full flex flex-col justify-between p-6 relative transition-all duration-200 ${
+                          className={`h-full flex flex-col justify-between p-6 rounded-2xl relative transition-all duration-300 ${
                             isApex
-                              ? 'bg-[var(--surface-elevated)] border-[var(--highlight-color)]/50 shadow-md ring-1 ring-[var(--highlight-color)]/20'
-                              : 'border-[var(--border-color)]'
+                              ? 'bg-[var(--surface-color)] border-purple-400/60 ring-2 ring-purple-500/20 shadow-md'
+                              : 'bg-[var(--surface-color)] border-[var(--border-color)] shadow-xs'
                           }`}
                         >
                           <div className="space-y-3">
                             {/* Card Top: Step Number + Icon + Emoji */}
                             <div className="flex items-center justify-between">
-                              <span className="text-2xl font-black text-[var(--text-muted)]/40 font-mono">
+                              <span className="text-2xl font-black text-[var(--text-muted)]/30 font-mono">
                                 {step.num}
                               </span>
                               <div className="flex items-center gap-2">
@@ -211,7 +207,7 @@ export default function HowItWorksSection() {
                           </div>
 
                           {isApex && (
-                            <div className="pt-3 mt-3 border-t border-[var(--highlight-color)]/30 flex items-center justify-between text-[11px] font-semibold text-[var(--highlight-color)]">
+                            <div className="pt-3 mt-3 border-t border-[var(--border-color)] flex items-center justify-between text-[11px] font-semibold text-purple-700 dark:text-purple-300">
                               <span>Core Diagnostic Milestone</span>
                               <span>★ Key Step</span>
                             </div>
@@ -232,16 +228,16 @@ export default function HowItWorksSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.55, ease: 'easeOut' }}
-          className="mt-16 rounded-3xl overflow-hidden border border-[var(--border-color)] bg-[var(--surface-elevated)] shadow-lg"
+          className="mt-16 rounded-3xl overflow-hidden border border-[var(--border-color)] bg-[var(--surface-color)] shadow-lg"
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center p-6 sm:p-8 lg:p-10">
             {/* Left Story Content */}
             <div className="lg:col-span-7 space-y-4">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold text-[var(--accent-color)] bg-[var(--accent-color)]/15 border border-[var(--accent-color)]/25">
-                <span>🎓 Academic Excellence & Collaboration</span>
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold text-[var(--pastel-sky-text)] bg-[var(--pastel-sky)] border border-[var(--pastel-sky-border)] shadow-xs">
+                <span>🎓 Academic Excellence &amp; Collaboration</span>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-main)] tracking-tight">
-                Built For Serious Students, Aspiring Engineers & Career Changers
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-main)] tracking-tight font-heading">
+                Built For Serious Students, Aspiring Engineers &amp; Career Changers
               </h3>
               <p className="text-sm sm:text-base text-[var(--text-muted)] leading-relaxed">
                 Rather than generic certificates or superficial quizzes, Skillora AI focuses on objective diagnostic
@@ -250,13 +246,13 @@ export default function HowItWorksSection() {
               </p>
               <div className="flex flex-wrap items-center gap-6 pt-2 text-xs font-medium text-[var(--text-muted)]">
                 <span className="flex items-center gap-1.5">
-                  <span className="text-[var(--accent-color)]">●</span> 100% Free & Open Benchmarks
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" /> 100% Free &amp; Open Benchmarks
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="text-[var(--primary-color)]">●</span> Zero AI Hallucination Claims
+                  <span className="w-2 h-2 rounded-full bg-indigo-500" /> Zero AI Hallucination Claims
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="text-[var(--highlight-color)]">●</span> Structured Milestone Pacing
+                  <span className="w-2 h-2 rounded-full bg-purple-500" /> Structured Milestone Pacing
                 </span>
               </div>
             </div>
@@ -274,7 +270,7 @@ export default function HowItWorksSection() {
                 />
               </div>
               <div className="absolute bottom-3 left-3 right-3 p-2.5 rounded-xl bg-[var(--surface-color)]/95 backdrop-blur-md border border-[var(--border-color)] text-[11px] font-medium text-[var(--text-main)] shadow-sm">
-                <p className="truncate">Collaborative peer study & diagnostic validation</p>
+                <p className="truncate">Collaborative peer study &amp; diagnostic validation</p>
               </div>
             </div>
           </div>

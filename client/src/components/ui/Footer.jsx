@@ -9,7 +9,7 @@ const CURRENT_YEAR = new Date().getFullYear();
  */
 export default function Footer() {
   return (
-    <footer className="w-full bg-[var(--surface-color)] border-t border-[var(--border-color)] py-12 sm:py-16 transition-colors">
+    <footer className="w-full bg-[var(--surface-color)]/70 backdrop-blur-md border-t border-[var(--border-color)] py-12 sm:py-16 transition-colors">
       <Container>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           {/* Brand & Value Proposition */}
@@ -55,11 +55,6 @@ export default function Footer() {
                   Career Paths
                 </a>
               </li>
-              <li>
-                <Link to="/setup-check" className="hover:text-[var(--text-main)] transition-colors">
-                  System Health Check
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -71,12 +66,12 @@ export default function Footer() {
             <ul className="space-y-2 text-sm text-[var(--text-muted)]">
               <li>
                 <Link to="/login" className="hover:text-[var(--text-main)] transition-colors">
-                  Sign In (Phase 4)
+                  Sign In
                 </Link>
               </li>
               <li>
                 <Link to="/register" className="hover:text-[var(--text-main)] transition-colors">
-                  Register (Phase 4)
+                  Create Account
                 </Link>
               </li>
               <li>

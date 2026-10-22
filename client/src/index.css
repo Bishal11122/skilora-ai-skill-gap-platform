@@ -5,45 +5,120 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-heading: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-body);
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* Skillora AI Modern SaaS — Light Theme (Crisp, clean, professional) */
-  --bg-color: #F8FAFC;
+  /* Skillora AI SaaS — Light Theme (Crisp, High-Precision Product Palette with Soft Pastels) */
+  --bg-color: #FAFCFF;
   --surface-color: #FFFFFF;
-  --surface-elevated: #F1F5F9;
+  --surface-elevated: #F4F7FB;
+  --surface-hover: #F0F4F9;
   --border-color: #E2E8F0;
+  --border-subtle: #F1F5F9;
   --primary-color: #4F46E5;
   --primary-hover: #4338CA;
+  --primary-light: #EEF2FF;
   --accent-color: #0284C7;
   --accent-hover: #0369A1;
+  --accent-light: #F0F9FF;
   --highlight-color: #6366F1;
   --highlight-hover: #4F46E5;
   --text-main: #0F172A;
-  --text-muted: #64748B;
+  --text-muted: #526175;
+  --text-subtle: #94A3B8;
   --focus-ring: #4F46E5;
   --success-color: #10B981;
   --warning-color: #F59E0B;
   --danger-color: #EF4444;
+
+  /* Pastel Palette (Reference Image 1: Mint, Lavender, Sky, Peach) */
+  --pastel-mint: #E8F8F2;
+  --pastel-mint-border: #C6EFE0;
+  --pastel-mint-text: #065F46;
+  --pastel-mint-accent: #10B981;
+
+  --pastel-lavender: #F4EEFF;
+  --pastel-lavender-border: #E4D5FF;
+  --pastel-lavender-text: #5B21B6;
+  --pastel-lavender-accent: #8B5CF6;
+
+  --pastel-sky: #E7F4FE;
+  --pastel-sky-border: #BAE6FD;
+  --pastel-sky-text: #0369A1;
+  --pastel-sky-accent: #0284C7;
+
+  --pastel-peach: #FFF2E8;
+  --pastel-peach-border: #FED7AA;
+  --pastel-peach-text: #9A3412;
+  --pastel-peach-accent: #F97316;
+
+  /* Translucent Glassmorphism */
+  --glass-surface: rgba(255, 255, 255, 0.78);
+  --glass-border: rgba(255, 255, 255, 0.85);
+  --glass-shadow: 0 16px 36px -10px rgba(15, 23, 42, 0.06);
+
+  --shadow-sm: 0 1px 3px 0 rgb(15 23 42 / 0.04);
+  --shadow-md: 0 4px 10px -1px rgb(15 23 42 / 0.05), 0 2px 4px -2px rgb(15 23 42 / 0.04);
+  --shadow-lg: 0 12px 24px -4px rgb(15 23 42 / 0.06), 0 4px 8px -4px rgb(15 23 42 / 0.03);
+  --shadow-card: 0 8px 24px -6px rgba(15, 23, 42, 0.04), 0 2px 6px -2px rgba(15, 23, 42, 0.02);
 }
 
 .dark {
-  /* Skillora AI Modern SaaS — Dark Theme (Clean slate-navy) */
-  --bg-color: #0B0F19;
-  --surface-color: #111827;
-  --surface-elevated: #1F2937;
-  --border-color: #374151;
+  /* Skillora AI SaaS — Dark Theme (Obsidian & Jewel Pastel Tints) */
+  --bg-color: #090D16;
+  --surface-color: #101726;
+  --surface-elevated: #162033;
+  --surface-hover: #1E2B45;
+  --border-color: #242E42;
+  --border-subtle: #192237;
   --primary-color: #6366F1;
   --primary-hover: #4F46E5;
+  --primary-light: rgba(99, 102, 241, 0.16);
   --accent-color: #38BDF8;
   --accent-hover: #0EA5E9;
+  --accent-light: rgba(56, 189, 248, 0.14);
   --highlight-color: #818CF8;
   --highlight-hover: #6366F1;
   --text-main: #F8FAFC;
   --text-muted: #94A3B8;
+  --text-subtle: #64748B;
   --focus-ring: #6366F1;
   --success-color: #34D399;
   --warning-color: #FBBF24;
   --danger-color: #F87171;
+
+  /* Pastel Jewel Tints for Dark Mode */
+  --pastel-mint: #0E2920;
+  --pastel-mint-border: #1B4536;
+  --pastel-mint-text: #6EE7B7;
+  --pastel-mint-accent: #34D399;
+
+  --pastel-lavender: #211636;
+  --pastel-lavender-border: #3A275E;
+  --pastel-lavender-text: #DDD6FE;
+  --pastel-lavender-accent: #A78BFA;
+
+  --pastel-sky: #0F253C;
+  --pastel-sky-border: #193D61;
+  --pastel-sky-text: #7DD3FC;
+  --pastel-sky-accent: #38BDF8;
+
+  --pastel-peach: #2B1812;
+  --pastel-peach-border: #4D2B20;
+  --pastel-peach-text: #FDBA74;
+  --pastel-peach-accent: #FB923C;
+
+  /* Translucent Glassmorphism in Dark Mode */
+  --glass-surface: rgba(16, 23, 38, 0.78);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.45);
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  --shadow-card: 0 8px 24px -6px rgba(0, 0, 0, 0.4);
 }
 
 @theme {
@@ -65,12 +140,92 @@
 body {
   background-color: var(--bg-color);
   color: var(--text-main);
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   min-height: 100vh;
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+/* Glassmorphism Surface (Reference Image 1) */
+.glass-panel {
+  background: var(--glass-surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Soft Pastel Card Surfaces (Reference Image 1) */
+.card-pastel-mint {
+  background-color: var(--pastel-mint);
+  border-color: var(--pastel-mint-border);
+  color: var(--pastel-mint-text);
+}
+
+.card-pastel-lavender {
+  background-color: var(--pastel-lavender);
+  border-color: var(--pastel-lavender-border);
+  color: var(--pastel-lavender-text);
+}
+
+.card-pastel-sky {
+  background-color: var(--pastel-sky);
+  border-color: var(--pastel-sky-border);
+  color: var(--pastel-sky-text);
+}
+
+.card-pastel-peach {
+  background-color: var(--pastel-peach);
+  border-color: var(--pastel-peach-border);
+  color: var(--pastel-peach-text);
+}
+
+/* Horizontal scroll container with hidden scrollbars for clean slider */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Tabular figures for stats and metrics */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Subtle scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }
 
 /* Accessible reduced motion preference */

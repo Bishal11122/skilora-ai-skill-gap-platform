@@ -335,27 +335,34 @@ export default function ResumeUploadPage() {
   }
 
   return (
-    <div className="py-12 sm:py-16 min-h-[75vh]">
+    <div className="relative py-12 sm:py-16 min-h-[75vh] overflow-hidden">
+      {/* Soft Pastel Ambient Aura */}
+      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-r from-emerald-100/35 via-violet-100/30 to-sky-100/35 dark:from-emerald-950/20 dark:via-purple-950/20 dark:to-sky-950/20 rounded-full blur-3xl pointer-events-none -z-10" />
+
       <Container size="default">
-        <div className="max-w-3xl mx-auto space-y-8">
+        <div className="max-w-3xl mx-auto space-y-7">
           {/* Header */}
           <div className="text-center space-y-2">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-main)]">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold text-[var(--primary-color)] bg-[var(--primary-color)]/10 border border-[var(--primary-color)]/20 mb-1">
+              <FileText className="w-3.5 h-3.5" />
+              <span>Step 2 of 5: Technical Resume Ingestion</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-main)] font-heading">
               Upload Your Technical Resume
             </h1>
-            <p className="text-xs sm:text-sm text-[var(--text-muted)] max-w-lg mx-auto">
+            <p className="text-xs sm:text-sm text-[var(--text-muted)] max-w-lg mx-auto leading-relaxed">
               Upload your PDF or DOCX resume to automatically detect your technical skills and compare them against your career benchmark.
             </p>
           </div>
 
           {/* Active Career Goal Banner */}
-          <div className="p-4 rounded-2xl bg-[var(--surface-elevated)] border border-[var(--border-color)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="p-4 sm:p-5 rounded-2xl glass-panel flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-9 h-9 rounded-xl bg-[var(--primary-color)]/10 text-[var(--primary-color)] flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-[var(--primary-color)]/10 text-[var(--primary-color)] flex items-center justify-center shrink-0">
                 <Compass className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] font-mono">
                   Active Career Benchmark
                 </p>
                 <p className="text-sm font-bold text-[var(--text-main)] truncate">
@@ -366,7 +373,7 @@ export default function ResumeUploadPage() {
 
             <Link
               to="/career"
-              className="text-xs font-semibold text-[var(--primary-color)] hover:underline self-start sm:self-auto shrink-0 focus:outline-none focus:ring-1 focus:ring-[var(--focus-ring)] rounded"
+              className="text-xs font-semibold text-[var(--primary-color)] hover:underline self-start sm:self-auto shrink-0"
             >
               Change Goal
             </Link>
@@ -396,7 +403,7 @@ export default function ResumeUploadPage() {
 
           {/* Existing Saved Resume Card */}
           {existingResume && (
-            <Card className="p-6 sm:p-7 border-[var(--border-color)] bg-[var(--surface-color)] shadow-md space-y-6">
+            <Card variant="glass" className="p-6 sm:p-7 shadow-lg space-y-6 rounded-2xl">
               <div className="flex items-start justify-between gap-4 pb-4 border-b border-[var(--border-color)]">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-10 h-10 rounded-xl bg-[var(--success-color)]/10 text-[var(--success-color)] flex items-center justify-center shrink-0">
@@ -447,14 +454,14 @@ export default function ResumeUploadPage() {
                 </div>
               </div>
 
-              {/* Phase 6: AI Skill Extraction Section */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-[var(--surface-elevated)] border border-[var(--border-color)] space-y-4">
+              {/* AI Skill Extraction Section */}
+              <div className="p-4 sm:p-5 rounded-xl bg-[var(--surface-color)] border border-[var(--border-color)] space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-[var(--border-color)]">
                   <div className="space-y-0.5">
                     <div className="inline-flex items-center gap-1.5">
-                      <Sparkles className="w-4 h-4 text-amber-500" aria-hidden="true" />
-                      <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent-color)]">
-                        Phase 6 AI Skill Extraction
+                      <Sparkles className="w-4 h-4 text-[var(--primary-color)]" aria-hidden="true" />
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--primary-color)] font-mono">
+                        AI Skill Extraction Engine
                       </span>
                     </div>
                     <h3 className="text-sm sm:text-base font-bold text-[var(--text-main)]">
@@ -652,7 +659,7 @@ export default function ResumeUploadPage() {
 
           {/* Upload Form Card (shown when no resume exists, or when replacing) */}
           {(!existingResume || confirmReplace) && (
-            <Card className="p-6 sm:p-8 border-[var(--border-color)] bg-[var(--surface-color)] shadow-md space-y-6">
+            <Card variant="glass" className="p-6 sm:p-8 shadow-lg space-y-6 rounded-2xl">
               <div className="space-y-1">
                 <h2 className="text-lg font-bold text-[var(--text-main)] tracking-tight">
                   {existingResume ? 'Select Replacement Document' : 'Select Resume File'}
@@ -793,9 +800,10 @@ export default function ResumeUploadPage() {
                   <Button
                     variant="primary"
                     size="lg"
+                    pill
                     disabled={!selectedFile || !consentChecked || isUploading}
                     onClick={() => handleUploadSubmit(Boolean(existingResume))}
-                    className="w-full sm:w-auto justify-center"
+                    className="w-full sm:w-auto justify-center shadow-md shadow-primary-500/20"
                   >
                     {isUploading ? (
                       <>

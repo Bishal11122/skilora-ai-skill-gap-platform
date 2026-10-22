@@ -9,6 +9,7 @@ import Container from '../components/ui/Container';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
+import Logo from '../components/ui/Logo';
 
 const registerSchema = z
   .object({
@@ -66,12 +67,24 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="py-16 sm:py-24 min-h-[75vh] flex items-center justify-center">
-      <Container size="narrow">
-        <Card className="max-w-md mx-auto p-6 sm:p-8 space-y-6 shadow-md border-[var(--border-color)] bg-[var(--surface-color)]">
+    <div className="py-16 sm:py-24 min-h-[75vh] flex items-center justify-center relative overflow-hidden">
+      {/* Soft pastel ambient background meshes */}
+      <div
+        className="absolute top-1/4 -right-20 w-80 h-80 rounded-full bg-purple-200/40 dark:bg-purple-900/15 blur-3xl pointer-events-none"
+        aria-hidden="true"
+      />
+      <div
+        className="absolute bottom-1/4 -left-20 w-80 h-80 rounded-full bg-emerald-200/40 dark:bg-emerald-900/15 blur-3xl pointer-events-none"
+        aria-hidden="true"
+      />
+
+      <Container size="narrow" className="relative z-10">
+        <Card className="max-w-md mx-auto p-6 sm:p-8 space-y-6 shadow-xl border border-white/80 dark:border-white/10 glass-panel rounded-3xl">
           <div className="text-center space-y-2">
-            <Badge variant="plum">Account Registration</Badge>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-main)]">
+            <div className="flex justify-center mb-1">
+              <Badge variant="plum">Account Registration</Badge>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-main)] font-heading">
               Create Your Skillora AI Account
             </h1>
             <p className="text-xs sm:text-sm text-[var(--text-muted)]">
@@ -82,7 +95,7 @@ export default function RegisterPage() {
           {serverError && (
             <div
               role="alert"
-              className="p-3.5 rounded-xl bg-[var(--danger-color)]/10 border border-[var(--danger-color)]/25 text-[var(--danger-color)] text-xs sm:text-sm font-medium"
+              className="p-3.5 rounded-lg bg-[var(--danger-color)]/10 border border-[var(--danger-color)]/25 text-[var(--danger-color)] text-xs font-medium"
             >
               {serverError}
             </div>
@@ -104,7 +117,7 @@ export default function RegisterPage() {
                 disabled={isSubmitting}
                 aria-invalid={!!errors.displayName}
                 aria-describedby={errors.displayName ? 'displayName-error' : undefined}
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-[var(--surface-elevated)] border border-[var(--border-color)] text-[var(--text-main)] placeholder-[var(--text-muted)]/60 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] transition-colors"
+                className="w-full px-3.5 py-2 rounded-lg text-xs sm:text-sm bg-[var(--surface-elevated)] border border-[var(--border-color)] text-[var(--text-main)] placeholder-[var(--text-muted)]/60 focus:outline-none focus:ring-1 focus:ring-[var(--focus-ring)] focus:border-[var(--focus-ring)] transition-colors"
                 placeholder="e.g. Alex Sharma"
                 {...register('displayName')}
               />
@@ -130,7 +143,7 @@ export default function RegisterPage() {
                 disabled={isSubmitting}
                 aria-invalid={!!errors.email}
                 aria-describedby={errors.email ? 'email-error' : undefined}
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-[var(--surface-elevated)] border border-[var(--border-color)] text-[var(--text-main)] placeholder-[var(--text-muted)]/60 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] transition-colors"
+                className="w-full px-3.5 py-2 rounded-lg text-xs sm:text-sm bg-[var(--surface-elevated)] border border-[var(--border-color)] text-[var(--text-main)] placeholder-[var(--text-muted)]/60 focus:outline-none focus:ring-1 focus:ring-[var(--focus-ring)] focus:border-[var(--focus-ring)] transition-colors"
                 placeholder="student@example.com"
                 {...register('email')}
               />
@@ -157,7 +170,7 @@ export default function RegisterPage() {
                   disabled={isSubmitting}
                   aria-invalid={!!errors.password}
                   aria-describedby={errors.password ? 'password-error' : undefined}
-                  className="w-full pl-3.5 pr-10 py-2.5 rounded-xl text-sm bg-[var(--surface-elevated)] border border-[var(--border-color)] text-[var(--text-main)] placeholder-[var(--text-muted)]/60 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] transition-colors"
+                  className="w-full pl-3.5 pr-10 py-2 rounded-lg text-xs sm:text-sm bg-[var(--surface-elevated)] border border-[var(--border-color)] text-[var(--text-main)] placeholder-[var(--text-muted)]/60 focus:outline-none focus:ring-1 focus:ring-[var(--focus-ring)] focus:border-[var(--focus-ring)] transition-colors"
                   placeholder="••••••••"
                   {...register('password')}
                 />
@@ -193,7 +206,7 @@ export default function RegisterPage() {
                   disabled={isSubmitting}
                   aria-invalid={!!errors.confirmPassword}
                   aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
-                  className="w-full pl-3.5 pr-10 py-2.5 rounded-xl text-sm bg-[var(--surface-elevated)] border border-[var(--border-color)] text-[var(--text-main)] placeholder-[var(--text-muted)]/60 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] transition-colors"
+                  className="w-full pl-3.5 pr-10 py-2 rounded-lg text-xs sm:text-sm bg-[var(--surface-elevated)] border border-[var(--border-color)] text-[var(--text-main)] placeholder-[var(--text-muted)]/60 focus:outline-none focus:ring-1 focus:ring-[var(--focus-ring)] focus:border-[var(--focus-ring)] transition-colors"
                   placeholder="••••••••"
                   {...register('confirmPassword')}
                 />
@@ -218,6 +231,7 @@ export default function RegisterPage() {
               type="submit"
               variant="primary"
               size="lg"
+              pill
               disabled={isSubmitting}
               className="w-full justify-center mt-2"
             >
