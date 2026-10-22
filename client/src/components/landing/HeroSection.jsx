@@ -5,7 +5,7 @@ import Button from '../ui/Button';
 
 /**
  * Section 1: Hero Section featuring authentic student photography,
- * editorial typography, and floating sample preview badges.
+ * editorial typography, and floating sample preview badges with pastel accents.
  */
 export default function HeroSection() {
   const shouldReduceMotion = useReducedMotion();
@@ -55,13 +55,13 @@ export default function HeroSection() {
 
   return (
     <section className="relative overflow-hidden pt-10 pb-16 sm:pt-16 sm:pb-24 lg:pt-20 lg:pb-28">
-      {/* Subtle ambient brand glow in background */}
+      {/* Soft Pastel Ambient Aura */}
       <div
-        className="absolute -top-32 left-1/4 w-96 h-96 bg-[var(--primary-color)]/6 rounded-full blur-3xl pointer-events-none"
+        className="absolute -top-32 left-1/4 w-[500px] h-[350px] bg-gradient-to-r from-emerald-100/40 via-violet-100/35 to-sky-100/40 dark:from-emerald-950/20 dark:via-purple-950/20 dark:to-sky-950/20 rounded-full blur-3xl pointer-events-none -z-10"
         aria-hidden="true"
       />
       <div
-        className="absolute top-1/2 -right-20 w-80 h-80 bg-[var(--highlight-color)]/6 rounded-full blur-3xl pointer-events-none"
+        className="absolute top-1/2 -right-20 w-80 h-80 bg-gradient-to-b from-orange-100/30 to-purple-100/30 dark:from-orange-950/15 dark:to-purple-950/15 rounded-full blur-3xl pointer-events-none -z-10"
         aria-hidden="true"
       />
 
@@ -76,7 +76,7 @@ export default function HeroSection() {
           >
             {/* Eyebrow badge */}
             <motion.div variants={itemVariants}>
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider text-[var(--primary-color)] bg-[var(--primary-color)]/10 border border-[var(--primary-color)]/25">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider text-[var(--primary-color)] bg-[var(--primary-color)]/10 border border-[var(--primary-color)]/25 shadow-xs">
                 <Sparkles className="w-3.5 h-3.5 text-[var(--highlight-color)]" aria-hidden="true" />
                 <span>YOUR NEXT CHAPTER STARTS HERE</span>
               </div>
@@ -85,7 +85,7 @@ export default function HeroSection() {
             {/* Main Headline */}
             <motion.h1
               variants={itemVariants}
-              className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[var(--text-main)] leading-[1.12]"
+              className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[var(--text-main)] leading-[1.12] font-heading"
             >
               Know your skills.{' '}
               <span className="text-[var(--primary-color)]">Close the gaps.</span>{' '}
@@ -113,11 +113,11 @@ export default function HeroSection() {
               variants={itemVariants}
               className="flex flex-wrap items-center gap-4 pt-2"
             >
-              <Button to="/register" variant="primary" size="lg">
+              <Button to="/register" variant="primary" size="lg" pill className="px-6 py-3 shadow-md shadow-primary-500/20">
                 Build My Career Roadmap
                 <ArrowRight className="w-4 h-4 ml-1.5" aria-hidden="true" />
               </Button>
-              <Button href="#how-it-works" variant="secondary" size="lg">
+              <Button href="#how-it-works" variant="secondary" size="lg" pill className="px-6 py-3">
                 Explore How It Works
               </Button>
             </motion.div>
@@ -127,27 +127,27 @@ export default function HeroSection() {
               variants={itemVariants}
               className="pt-4 border-t border-[var(--border-color)]"
             >
-              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-3">
-                5-Stage Career Acceleration Pipeline
+              <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2.5">
+                Continuous 5-Stage Learning Pipeline
               </p>
-              <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-[var(--text-main)]">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--surface-color)] border border-[var(--border-color)]">
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--pastel-mint)] text-[var(--pastel-mint-text)] border border-[var(--pastel-mint-border)] font-medium shadow-xs">
                   <span>📄</span> Resume
                 </span>
                 <span className="text-[var(--text-muted)]">&rarr;</span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--surface-color)] border border-[var(--border-color)]">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--pastel-lavender)] text-[var(--pastel-lavender-text)] border border-[var(--pastel-lavender-border)] font-medium shadow-xs">
                   <span>🧠</span> Assessment
                 </span>
                 <span className="text-[var(--text-muted)]">&rarr;</span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--surface-color)] border border-[var(--border-color)]">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--pastel-sky)] text-[var(--pastel-sky-text)] border border-[var(--pastel-sky-border)] font-medium shadow-xs">
                   <span>🧩</span> Gap Diagnosis
                 </span>
                 <span className="text-[var(--text-muted)]">&rarr;</span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--surface-color)] border border-[var(--border-color)]">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--pastel-peach)] text-[var(--pastel-peach-text)] border border-[var(--pastel-peach-border)] font-medium shadow-xs">
                   <span>🗺️</span> Roadmap
                 </span>
                 <span className="text-[var(--text-muted)]">&rarr;</span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--primary-color)]/10 text-[var(--primary-color)] border border-[var(--primary-color)]/30 font-semibold">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--primary-color)]/10 text-[var(--primary-color)] border border-[var(--primary-color)]/30 font-semibold shadow-xs">
                   <span>🚀</span> Career
                 </span>
               </div>
@@ -174,7 +174,7 @@ export default function HeroSection() {
                 />
                 {/* Subtle warm gradient overlay to guarantee text contrast */}
                 <div
-                  className="absolute inset-0 bg-gradient-to-t from-[var(--bg-color)] via-transparent to-black/20 pointer-events-none"
+                  className="absolute inset-0 bg-gradient-to-t from-[var(--surface-color)] via-transparent to-black/20 pointer-events-none"
                   aria-hidden="true"
                 />
 
@@ -197,7 +197,7 @@ export default function HeroSection() {
                       <p className="text-[10px] text-[var(--text-muted)]">Benchmark: 85% Industry Standard</p>
                     </div>
                   </div>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[var(--accent-color)]/15 text-[var(--accent-color)] border border-[var(--accent-color)]/25">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[var(--pastel-mint)] text-[var(--pastel-mint-text)] border border-[var(--pastel-mint-border)]">
                     Sample Data
                   </span>
                 </div>

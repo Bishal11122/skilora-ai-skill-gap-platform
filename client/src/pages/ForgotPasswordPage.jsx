@@ -10,6 +10,8 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
 
+import Logo from '../components/ui/Logo';
+
 const forgotPasswordSchema = z.object({
   email: z
     .string()
@@ -46,12 +48,25 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="py-16 sm:py-24 min-h-[75vh] flex items-center justify-center">
-      <Container size="narrow">
-        <Card className="max-w-md mx-auto p-6 sm:p-8 space-y-6 shadow-md border-[var(--border-color)] bg-[var(--surface-color)]">
+    <div className="py-16 sm:py-24 min-h-[75vh] flex items-center justify-center relative overflow-hidden">
+      {/* Soft pastel ambient background meshes */}
+      <div
+        className="absolute top-1/4 -left-20 w-80 h-80 rounded-full bg-purple-200/40 dark:bg-purple-900/15 blur-3xl pointer-events-none"
+        aria-hidden="true"
+      />
+      <div
+        className="absolute bottom-1/4 -right-20 w-80 h-80 rounded-full bg-sky-200/40 dark:bg-sky-900/15 blur-3xl pointer-events-none"
+        aria-hidden="true"
+      />
+
+      <Container size="narrow" className="relative z-10">
+        <div className="flex justify-center mb-6">
+          <Logo />
+        </div>
+        <Card className="max-w-md mx-auto p-6 sm:p-8 space-y-6 shadow-xl border border-white/80 dark:border-white/10 glass-panel rounded-3xl">
           <div className="text-center space-y-2">
             <Badge variant="plum">Password Recovery</Badge>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-main)]">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-main)] font-heading">
               Reset Your Password
             </h1>
             <p className="text-xs sm:text-sm text-[var(--text-muted)]">
@@ -107,7 +122,7 @@ export default function ForgotPasswordPage() {
                     disabled={isSubmitting}
                     aria-invalid={!!errors.email}
                     aria-describedby={errors.email ? 'email-error' : undefined}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-[var(--surface-elevated)] border border-[var(--border-color)] text-[var(--text-main)] placeholder-[var(--text-muted)]/60 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] transition-colors"
+                    className="w-full px-3.5 py-2 rounded-lg text-xs sm:text-sm bg-[var(--surface-elevated)] border border-[var(--border-color)] text-[var(--text-main)] placeholder-[var(--text-muted)]/60 focus:outline-none focus:ring-1 focus:ring-[var(--focus-ring)] focus:border-[var(--focus-ring)] transition-colors"
                     placeholder="student@example.com"
                     {...register('email')}
                   />
@@ -122,8 +137,9 @@ export default function ForgotPasswordPage() {
                   type="submit"
                   variant="primary"
                   size="lg"
+                  pill
                   disabled={isSubmitting}
-                  className="w-full justify-center mt-2"
+                  className="w-full justify-center mt-2 shadow-md shadow-primary-500/20"
                 >
                   {isSubmitting ? (
                     <>

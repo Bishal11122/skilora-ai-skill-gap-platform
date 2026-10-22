@@ -7,10 +7,7 @@ import Card from '../ui/Card';
 
 /**
  * Section 4: Career Paths Section showcasing 5 target roles.
- *
- * NOTE: These are static marketing labels for the public landing view.
- * Real career benchmark skills and required scoring thresholds are planned
- * to be stored and retrieved dynamically from Cloud Firestore in Phase 6.
+ * Styled with soft pastel accents and interactive hover effects.
  */
 export default function CareerPathsSection() {
   const shouldReduceMotion = useReducedMotion();
@@ -22,6 +19,7 @@ export default function CareerPathsSection() {
       title: 'Full Stack Developer',
       roleBadge: 'Engineering',
       badgeColor: 'plum',
+      cardVariant: 'lavender',
       description: 'Master modern frontend and backend frameworks, relational databases, and secure REST APIs.',
       skills: ['React', 'Node.js', 'PostgreSQL', 'REST APIs', 'System Design'],
     },
@@ -31,6 +29,7 @@ export default function CareerPathsSection() {
       title: 'Frontend Developer',
       roleBadge: 'Interface',
       badgeColor: 'coral',
+      cardVariant: 'mint',
       description: 'Specialize in responsive interfaces, modern component architecture, state management, and web performance.',
       skills: ['TypeScript', 'React', 'Tailwind CSS', 'Web Vitals', 'UI/UX'],
     },
@@ -40,6 +39,7 @@ export default function CareerPathsSection() {
       title: 'Data Analyst',
       roleBadge: 'Analytics',
       badgeColor: 'sage',
+      cardVariant: 'sky',
       description: 'Analyze data trends, write performant SQL queries, and construct actionable visual dashboards.',
       skills: ['SQL', 'Python', 'PowerBI', 'Statistics', 'Data Modeling'],
     },
@@ -49,6 +49,7 @@ export default function CareerPathsSection() {
       title: 'Python Developer',
       roleBadge: 'Backend',
       badgeColor: 'plum',
+      cardVariant: 'peach',
       description: 'Develop backend automation services, data pipelines, asynchronous APIs, and server-side utilities.',
       skills: ['Python', 'FastAPI', 'AsyncIO', 'Docker', 'PostgreSQL'],
     },
@@ -58,6 +59,7 @@ export default function CareerPathsSection() {
       title: 'AI/ML Engineer',
       roleBadge: 'Intelligence',
       badgeColor: 'coral',
+      cardVariant: 'lavender',
       description: 'Design machine learning workflows, fine-tune models, and integrate generative AI APIs and vector search.',
       skills: ['PyTorch', 'LLM APIs', 'Prompt Eng', 'Vector DBs', 'RAG'],
     },
@@ -83,7 +85,7 @@ export default function CareerPathsSection() {
   };
 
   return (
-    <section id="careers" className="py-20 sm:py-24 bg-[var(--bg-color)]">
+    <section id="careers" className="py-20 sm:py-24 bg-[var(--bg-color)] transition-colors">
       <Container>
         <SectionHeading
           badge="Target Roles"
@@ -106,17 +108,18 @@ export default function CareerPathsSection() {
             return (
               <motion.div key={career.title} variants={itemVariants} className={spanClass}>
                 <Card
+                  variant={career.cardVariant}
                   hover
-                  className="h-full flex flex-col justify-between p-6 sm:p-7 border-[var(--border-color)] hover:border-[var(--primary-color)]/40 hover:shadow-md transition-all duration-200"
+                  className="h-full flex flex-col justify-between p-6 sm:p-7 rounded-2xl transition-all duration-300"
                 >
                   <div className="space-y-4">
                     {/* Header: Role Icon + Tag + Tasteful Emoji */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-11 h-11 rounded-xl bg-[var(--surface-elevated)] text-[var(--primary-color)] border border-[var(--border-color)] flex items-center justify-center">
+                        <div className="w-11 h-11 rounded-xl bg-white/70 dark:bg-black/20 text-[var(--primary-color)] border border-[var(--border-color)]/50 flex items-center justify-center">
                           <Icon className="w-5 h-5" aria-hidden="true" />
                         </div>
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[var(--primary-color)]/10 text-[var(--primary-color)]">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/80 dark:bg-black/20 text-[var(--text-main)] border border-[var(--border-color)]/60">
                           {career.roleBadge}
                         </span>
                       </div>
@@ -127,24 +130,24 @@ export default function CareerPathsSection() {
 
                     {/* Title Area */}
                     <div>
-                      <h3 className="text-lg font-bold text-[var(--text-main)] tracking-tight">
+                      <h3 className="text-lg font-bold tracking-tight">
                         {career.title}
                       </h3>
-                      <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed mt-1.5">
+                      <p className="text-xs sm:text-sm opacity-90 leading-relaxed mt-1.5">
                         {career.description}
                       </p>
                     </div>
 
                     {/* Skill Benchmark Badges */}
                     <div className="pt-2">
-                      <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2">
+                      <p className="text-[10px] font-bold uppercase tracking-wider mb-2 opacity-80">
                         Core Competencies
                       </p>
                       <div className="flex flex-wrap gap-1.5">
                         {career.skills.map((skill) => (
                           <span
                             key={skill}
-                            className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-[var(--surface-elevated)] text-[var(--text-main)] border border-[var(--border-color)]"
+                            className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-white/80 dark:bg-black/30 border border-current/20 shadow-2xs"
                           >
                             {skill}
                           </span>
@@ -154,10 +157,10 @@ export default function CareerPathsSection() {
                   </div>
 
                   {/* Destination-checked CTA */}
-                  <div className="pt-5 mt-5 border-t border-[var(--border-color)]">
+                  <div className="pt-5 mt-5 border-t border-current/15">
                     <Link
                       to="/register"
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--primary-color)] hover:text-[var(--primary-hover)] transition-colors group"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold transition-colors group"
                       aria-label={`Explore ${career.title} roadmap`}
                     >
                       <span>Explore role roadmap</span>

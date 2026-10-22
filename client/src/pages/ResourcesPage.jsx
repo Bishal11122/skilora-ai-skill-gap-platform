@@ -122,13 +122,16 @@ export default function ResourcesPage() {
   };
 
   return (
-    <div className="py-8 sm:py-12 min-h-[75vh]">
-      <Container size="narrow">
+    <div className="relative py-8 sm:py-12 min-h-[75vh] overflow-hidden">
+      {/* Soft Pastel Ambient Aura */}
+      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-r from-emerald-100/35 via-violet-100/30 to-sky-100/35 dark:from-emerald-950/20 dark:via-purple-950/20 dark:to-sky-950/20 rounded-full blur-3xl pointer-events-none -z-10" />
+
+      <Container size="default">
         <div className="space-y-6">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-[var(--border-color)]">
             <div className="space-y-1">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--text-main)]">
+              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[var(--text-main)] font-heading">
                 Curated Learning Resources
               </h1>
               <p className="text-xs sm:text-sm text-[var(--text-muted)]">
@@ -136,7 +139,7 @@ export default function ResourcesPage() {
               </p>
             </div>
 
-            <Button to="/roadmap" variant="secondary" size="sm" className="self-start sm:self-auto text-xs">
+            <Button to="/roadmap" variant="secondary" size="sm" pill className="self-start sm:self-auto text-xs">
               View Roadmap
               <ArrowRight className="w-3.5 h-3.5 ml-1" />
             </Button>
@@ -155,7 +158,7 @@ export default function ResourcesPage() {
 
           {/* Loading State */}
           {loading && (
-            <Card className="p-10 text-center border-[var(--border-color)] bg-[var(--surface-color)] shadow-xs space-y-3">
+            <Card variant="glass" className="p-10 text-center rounded-2xl shadow-sm space-y-3">
               <Loader2 className="w-6 h-6 animate-spin text-[var(--primary-color)] mx-auto" />
               <p className="text-sm font-semibold text-[var(--text-main)]">Loading resources...</p>
             </Card>
@@ -163,7 +166,7 @@ export default function ResourcesPage() {
 
           {/* No Career Selected State */}
           {!loading && !profile?.selectedCareerId && (
-            <Card className="p-8 text-center border-[var(--border-color)] bg-[var(--surface-color)] shadow-xs space-y-4">
+            <Card variant="glass" className="p-8 text-center rounded-2xl shadow-sm space-y-4">
               <Compass className="w-8 h-8 text-[var(--text-muted)] mx-auto" />
               <div className="space-y-1">
                 <h2 className="text-base font-bold text-[var(--text-main)]">Target Career Required</h2>
@@ -171,7 +174,7 @@ export default function ResourcesPage() {
                   Select a career goal to view resources curated for your benchmark requirements.
                 </p>
               </div>
-              <Button to="/career" variant="primary" size="sm">
+              <Button to="/career" variant="primary" size="sm" pill>
                 Choose Career Goal
                 <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
               </Button>
@@ -182,7 +185,7 @@ export default function ResourcesPage() {
           {!loading && resourcePayload && (
             <div className="space-y-6">
               {/* Compact Search & Filter Bar */}
-              <Card className="p-4 border-[var(--border-color)] bg-[var(--surface-color)] shadow-xs space-y-3">
+              <Card variant="glass" className="p-5 rounded-2xl shadow-sm space-y-4">
                 {/* Search Input */}
                 <div className="relative">
                   <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
@@ -309,33 +312,35 @@ export default function ResourcesPage() {
                     </div>
 
                     {/* Clean Resource Cards Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {milestone.resources.map((res) => (
                         <Card
                           key={res.id}
-                          className="p-4 border-[var(--border-color)] bg-[var(--surface-color)] shadow-xs hover:border-[var(--primary-color)]/40 transition-colors flex flex-col justify-between space-y-2.5"
+                          variant="glass"
+                          hover
+                          className="p-5 shadow-sm rounded-2xl flex flex-col justify-between space-y-3"
                         >
-                          <div className="space-y-1.5">
+                          <div className="space-y-2">
                             <div className="flex items-center justify-between text-[11px]">
-                              <Badge variant="indigo" className="capitalize text-[9px] py-0 px-1.5">
+                              <Badge variant="lavender" className="capitalize text-[10px] py-0.5 px-2">
                                 {res.level}
                               </Badge>
-                              <span className="text-[var(--text-muted)] font-medium">
+                              <span className="text-[var(--text-muted)] font-semibold text-xs">
                                 {res.provider}
                               </span>
                             </div>
 
-                            <h3 className="text-xs sm:text-sm font-bold text-[var(--text-main)] line-clamp-1">
+                            <h3 className="text-sm font-bold text-[var(--text-main)] line-clamp-1">
                               {res.title}
                             </h3>
 
-                            <p className="text-[11px] text-[var(--text-muted)] line-clamp-2 leading-relaxed">
+                            <p className="text-xs text-[var(--text-muted)] line-clamp-2 leading-relaxed">
                               {res.description}
                             </p>
                           </div>
 
-                          <div className="pt-2 border-t border-[var(--border-color)]/60 flex items-center justify-between">
-                            <span className="text-[10px] text-[var(--text-muted)]">
+                          <div className="pt-3 border-t border-[var(--border-color)]/60 flex items-center justify-between">
+                            <span className="text-[11px] text-[var(--text-muted)] font-medium">
                               Est. {res.estimatedTime}
                             </span>
 
@@ -343,7 +348,7 @@ export default function ResourcesPage() {
                               href={res.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold bg-[var(--primary-color)] text-white hover:opacity-90 transition-opacity"
+                              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-[var(--primary-color)] text-white hover:opacity-95 shadow-xs hover:shadow-md transition-all"
                             >
                               Start Learning
                               <ExternalLink className="w-3 h-3" />

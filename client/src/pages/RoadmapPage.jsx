@@ -219,7 +219,10 @@ export default function RoadmapPage() {
   };
 
   return (
-    <div className="py-8 sm:py-12 min-h-[75vh]">
+    <div className="relative py-8 sm:py-12 min-h-[75vh] overflow-hidden">
+      {/* Soft Pastel Ambient Aura */}
+      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-r from-emerald-100/35 via-violet-100/30 to-sky-100/35 dark:from-emerald-950/20 dark:via-purple-950/20 dark:to-sky-950/20 rounded-full blur-3xl pointer-events-none -z-10" />
+
       <Container size="narrow">
         <div className="space-y-6">
           {/* ===================================================================
@@ -227,7 +230,7 @@ export default function RoadmapPage() {
              =================================================================== */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-[var(--border-color)]">
             <div className="space-y-1">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--text-main)]">
+              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[var(--text-main)] font-heading">
                 Your Learning Roadmap
               </h1>
               <p className="text-xs sm:text-sm text-[var(--text-muted)]">
@@ -244,6 +247,7 @@ export default function RoadmapPage() {
                 <Button
                   variant="secondary"
                   size="sm"
+                  pill
                   onClick={handleGenerateRoadmap}
                   disabled={generating}
                   className="text-xs"
