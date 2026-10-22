@@ -1,17 +1,58 @@
 import { auth } from './firebase';
 
-const API_BASE_URL =
-  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) ||
-  'http://localhost:5001/api';
+const PROD_API_URL = 'https://skilora-ai-skill-gap-platform.onrender.com/api';
+const DEV_API_URL = 'http://localhost:5001/api';
+
+/**
+ * Resolves the active backend API base URL.
+ * Prefers `import.meta.env.VITE_API_URL`.
+ * If unset:
+ *   - Production mode (`import.meta.env.PROD`): uses deployed Render backend
+ *   - Development mode (`import.meta.env.DEV`): uses local backend at localhost:5001
+ */
+export const API_BASE_URL = (() => {
+  const envUrl = typeof import.meta !== 'undefined' ? import.meta.env?.VITE_API_URL : null;
+  if (envUrl && typeof envUrl === 'string' && envUrl.trim()) {
+    return envUrl.trim().replace(/\/+$/, '');
+  }
+  const isProd = typeof import.meta !== 'undefined' && Boolean(import.meta.env?.PROD);
+  return isProd ? PROD_API_URL : DEV_API_URL;
+})();
+
+/**
+ * Safely resolves an endpoint to a complete, normalized API URL.
+ * Handles variations with or without trailing slashes and prevents duplicate `/api/api` paths.
+ *
+ * @param {string} endpoint - API path (e.g. '/users/me', 'careers', '/api/careers')
+ * @returns {string} Fully qualified URL
+ */
+export function buildApiUrl(endpoint = '') {
+  const base = API_BASE_URL.replace(/\/+$/, '');
+  const baseEndsWithApi = base.endsWith('/api');
+  let path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+
+  if (baseEndsWithApi) {
+    if (path === '/api') {
+      path = '';
+    } else if (path.startsWith('/api/')) {
+      path = path.slice(4);
+    }
+  } else {
+    if (!path.startsWith('/api/') && path !== '/api') {
+      path = `/api${path}`;
+    }
+  }
+
+  return `${base}${path}`;
+}
 
 /**
  * Public GET request helper (used for health checks and unauthenticated queries).
- * @param {string} endpoint - API endpoint (e.g., '/health')
+ * @param {string} endpoint - API endpoint (e.g., '/health' or '/api/health')
  * @returns {Promise<{ data: any, error: string | null }>}
  */
 export async function get(endpoint) {
-  const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  const url = `${API_BASE_URL}${path}`;
+  const url = buildApiUrl(endpoint);
 
   try {
     const response = await fetch(url, {
@@ -61,8 +102,7 @@ async function authenticatedRequest(endpoint, method = 'GET', body = null, extra
     return { data: null, error: 'Failed to retrieve authentication token' };
   }
 
-  const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  const url = `${API_BASE_URL}${path}`;
+  const url = buildApiUrl(endpoint);
 
   const headers = {
     Accept: 'application/json',
@@ -172,5 +212,6 @@ export default {
   patchAuth,
   deleteAuth,
   uploadAuth,
+  buildApiUrl,
   baseUrl: API_BASE_URL,
 };
