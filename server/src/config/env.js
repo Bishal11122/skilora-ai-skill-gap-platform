@@ -11,6 +11,35 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env'), override: true });
 export const PORT = Number(process.env.PORT) || 5000;
 export const NODE_ENV = process.env.NODE_ENV || 'development';
 export const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
+
+/**
+ * Returns a list of explicitly allowed client origins, merging default production
+ * and development domains with any comma-separated entries in CLIENT_URL / ALLOWED_ORIGINS.
+ */
+export function getAllowedOrigins() {
+  const envOrigins = [process.env.CLIENT_URL, process.env.ALLOWED_ORIGINS]
+    .filter(Boolean)
+    .flatMap((val) =>
+      typeof val === 'string'
+        ? val.split(',').map((s) => s.trim().replace(/\/+$/, ''))
+        : []
+    )
+    .filter(Boolean);
+
+  return Array.from(
+    new Set([
+      'https://skilora-ai-skill-gap-platform.vercel.app',
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'http://localhost:5175',
+      'http://127.0.0.1:5173',
+      'http://127.0.0.1:5174',
+      'http://127.0.0.1:5175',
+      ...envOrigins,
+    ])
+  );
+}
+
 export const FIREBASE_SERVICE_ACCOUNT_PATH = (process.env.FIREBASE_SERVICE_ACCOUNT_PATH || '')
   .trim()
   .replace(/^["']|["']$/g, '');
@@ -76,4 +105,5 @@ export default {
   GROQ_MODEL,
   isGroqConfigured,
   getGroqApiKey,
+  getAllowedOrigins,
 };
